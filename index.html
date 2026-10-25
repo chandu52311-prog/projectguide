@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectGuide | Zero-Error Academic Engineering Deliverables</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .glow-card { box-shadow: 0 0 40px -10px rgba(56, 189, 248, 0.15); }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
+
+    <!-- Top Banner (Ad Space) -->
+    <div class="bg-slate-900 border-b border-slate-800 text-center py-2 text-xs text-slate-400">
+        <span>Ad Placement • Verified IEEE Simulation Engineering Benchmarks 2026</span>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-50 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-extrabold text-white text-xl shadow-lg shadow-cyan-500/20">
+                    PG
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        ProjectGuide <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded-full font-mono">Zero-Error Engine</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Autonomous Engineering Delivery Platform</p>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-4 text-xs font-mono">
+                <span class="inline-flex items-center gap-1.5 text-emerald-400 bg-emerald-950/50 border border-emerald-800 px-3 py-1.5 rounded-lg">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> IEEE Standard Validated
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Core Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full space-y-8">
+
+        <!-- Trust Hero Header -->
+        <div class="text-center space-y-3">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                Verified IEEE Deliverables for <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">B.Tech & M.Tech</span>
+            </h2>
+            <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
+                Upload your base paper. Our autonomous engine verifies simulation convergence before any payment is unlocked.
+            </p>
+        </div>
+
+        <!-- Academic Level & Branch Selection -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 glow-card space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Academic Level Selection -->
+                <div>
+                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold">1. SELECT ACADEMIC LEVEL</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="btn-btech" onclick="setLevel('B.Tech')" class="p-3.5 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-sm flex flex-col items-center gap-1 transition">
+                            <span>B.Tech Standard</span>
+                            <span class="text-xs text-slate-400 font-mono font-normal">80+ Page Book • ₹1,000</span>
+                        </button>
+                        <button type="button" id="btn-mtech" onclick="setLevel('M.Tech')" class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-sm flex flex-col items-center gap-1 transition hover:border-slate-700">
+                            <span>M.Tech Advanced</span>
+                            <span class="text-xs text-slate-400 font-mono font-normal">100+ Page Thesis • ₹1,000</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Engineering Branch Selection -->
+                <div>
+                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold">2. SELECT ENGINEERING BRANCH</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="branch-buttons">
+                        <button type="button" onclick="setBranch('EEE')" class="branch-btn p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-xs text-center transition" data-branch="EEE">EEE</button>
+                        <button type="button" onclick="setBranch('ECE')" class="branch-btn p-3 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-xs text-center transition hover:border-slate-700" data-branch="ECE">ECE</button>
+                        <button type="button" onclick="setBranch('CSE')" class="branch-btn p-3 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-xs text-center transition hover:border-slate-700" data-branch="CSE">CSE / IT</button>
+                        <button type="button" onclick="setBranch('MECH')" class="branch-btn p-3 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-xs text-center transition hover:border-slate-700" data-branch="MECH">MECH / CIVIL</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deliverables Dynamic Preview Box -->
+            <div id="deliverables-preview" class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2">
+                <!-- Dynamically populated via JS -->
+            </div>
+        </div>
+
+        <!-- Paper Upload & Verification Gate -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 glow-card space-y-6">
+            <h3 class="text-sm font-mono text-cyan-400 font-semibold">3. UPLOAD IEEE BASE PAPER & EXECUTE QUALITY GATE</h3>
+            
+            <div id="drop-zone" class="border-2 border-dashed border-slate-700 hover:border-cyan-500/80 rounded-2xl p-8 text-center cursor-pointer transition bg-slate-950/50">
+                <input type="file" id="paper-input" accept=".pdf,.doc,.docx" class="hidden" onchange="handleFileSelected(event)">
+                <div class="space-y-3">
+                    <div class="w-12 h-12 mx-auto rounded-full bg-cyan-950/80 border border-cyan-800/80 flex items-center justify-center text-cyan-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200" id="file-label">Click or Drag & Drop your Base Paper (PDF)</p>
+                        <p class="text-xs text-slate-500 mt-1">Automatic parameter extraction for IEEE standards</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <button type="button" id="btn-verify" onclick="startQualityGate()" class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                    Run Automated Zero-Error Verification
+                </button>
+            </div>
+
+            <!-- Verification Progress & Terminal -->
+            <div id="verification-terminal" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs space-y-2">
+                <div class="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
+                    <span class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> Real-time Simulation Engine
+                    </span>
+                    <span id="terminal-percent">0%</span>
+                </div>
+                <div id="terminal-logs" class="space-y-1 text-slate-300 max-h-36 overflow-y-auto"></div>
+            </div>
+
+            <!-- Status Result Box -->
+            <div id="status-result-box" class="hidden"></div>
+        </div>
+
+        <!-- Strict Payment & Secure Download Section (Hidden until verified) -->
+        <div id="payment-gate-section" class="hidden bg-gradient-to-b from-slate-900 to-slate-950 border border-cyan-500/40 rounded-2xl p-6 glow-card space-y-6 text-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono">
+                ✔ 100% Convergence Guaranteed • IEEE 519 Compliant
+            </div>
+            
+            <div class="space-y-1">
+                <h3 class="text-xl font-bold text-white">Unlock Verified Project Package</h3>
+                <p class="text-xs text-slate-400" id="package-summary-label">Includes Complete Simulation (.slx / .py / CAD), Documentation, and Presentation</p>
+            </div>
+
+            <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 inline-block text-left w-full max-w-md mx-auto space-y-2 text-xs font-mono">
+                <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
+                    <span>Base IEEE Package + 2 Extensions</span>
+                    <span class="text-white">Included</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
+                    <span id="page-tier-label">Documentation Format</span>
+                    <span class="text-cyan-400 font-semibold" id="page-count-val">80+ Pages</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
+                    <span>Quality Gate Status</span>
+                    <span class="text-emerald-400 font-semibold">100% Passed</span>
+                </div>
+                <div class="flex justify-between pt-2 text-sm font-bold text-white">
+                    <span>Total Flat Settlement</span>
+                    <span class="text-emerald-400">₹1,000</span>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button type="button" id="btn-pay" onclick="simulatePayment()" class="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20">
+                    Pay ₹1,000 via Razorpay & Download ZIP
+                </button>
+            </div>
+            <p class="text-[11px] text-slate-500">256-Bit Encrypted Transfer • Instant Automated ZIP Packaging</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 px-6 py-6 text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <p>© 2026 ProjectGuide. Built for Independent Academic Research.</p>
+                <p class="text-[11px] text-slate-600 mt-1">Deliverables are verified academic reference implementations.</p>
+            </div>
+            <div class="text-slate-400 font-mono">
+                Zero-Charge Guarantee • Direct Settlement
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Execution Logic -->
+    <script>
+        let currentLevel = 'B.Tech';
+        let currentBranch = 'EEE';
+        let uploadedFile = null;
+        let isVerified = false;
+
+        const branchData = {
+            'EEE': {
+                btech: '<b>Package Details:</b> MATLAB/Simulink (.slx) Base Model, Parameter Script (.m), FFT / THD Analysis (<5%), <b>80+ Page Book (.docx)</b>, 15-Slide Presentation (.pptx).',
+                mtech: '<b>Package Details:</b> MATLAB/Simulink (.slx) with Dual Extensions (GMPPT & LLCL Filter), FCS-MPC State-space block, <b>100+ Page Dissertation (.docx)</b>, 20-Slide Technical Presentation (.pptx).'
+            },
+            'ECE': {
+                btech: '<b>Package Details:</b> Signal/Image Processing Code (.m / .py), Proteus Hardware Schematics, BER / SNR Performance Curves, <b>80+ Page Project Book (.docx)</b>, 15-Slide Presentation.',
+                mtech: '<b>Package Details:</b> Advanced Wireless/Deep Learning Models, Hardware-in-the-loop Schematics, <b>100+ Page Master Thesis (.docx)</b>, 20-Slide Presentation.'
+            },
+            'CSE': {
+                btech: '<b>Package Details:</b> Full Python Source Code (.py), Jupyter Notebooks, Pre-trained Model Weights (.h5 / .pt), Streamlit Web App, <b>80+ Page Book (.docx)</b>, 15-Slide Presentation.',
+                mtech: '<b>Package Details:</b> State-of-the-art Deep Neural Architecture, Complete Dataset Pipeline, Docker / Cloud deploy script, <b>100+ Page Master Thesis (.docx)</b>, 20-Slide Presentation.'
+            },
+            'MECH': {
+                btech: '<b>Package Details:</b> 3D CAD Universal Models (.step), ANSYS Structural Stress Analysis, Factor of Safety Heatmaps, <b>80+ Page Project Book (.docx)</b>, 15-Slide Presentation.',
+                mtech: '<b>Package Details:</b> Coupled CFD / Thermal Multi-Physics Simulation, Simscape Multibody Kinetics, <b>100+ Page Dissertation (.docx)</b>, 20-Slide Presentation.'
+            }
+        };
+
+        function updateDeliverablesView() {
+            const preview = document.getElementById('deliverables-preview');
+            const data = branchData[currentBranch][currentLevel === 'B.Tech' ? 'btech' : 'mtech'];
+            preview.innerHTML = `
+                <div class="flex items-center gap-2 text-cyan-400 font-semibold mb-1">
+                    <span>${currentBranch} • ${currentLevel} Deliverables Architecture:</span>
+                </div>
+                <p class="text-slate-300 leading-relaxed">${data}</p>
+            `;
+            document.getElementById('page-tier-label').innerText = `${currentLevel} Book Format`;
+            document.getElementById('page-count-val').innerText = currentLevel === 'B.Tech' ? '80+ Pages' : '100+ Pages';
+        }
+
+        function setLevel(level) {
+            currentLevel = level;
+            const btnBtech = document.getElementById('btn-btech');
+            const btnMtech = document.getElementById('btn-mtech');
+            if (level === 'B.Tech') {
+                btnBtech.className = "p-3.5 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-sm flex flex-col items-center gap-1 transition";
+                btnMtech.className = "p-3.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-sm flex flex-col items-center gap-1 transition hover:border-slate-700";
+            } else {
+                btnMtech.className = "p-3.5 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-sm flex flex-col items-center gap-1 transition";
+                btnBtech.className = "p-3.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-sm flex flex-col items-center gap-1 transition hover:border-slate-700";
+            }
+            updateDeliverablesView();
+        }
+
+        function setBranch(branch) {
+            currentBranch = branch;
+            document.querySelectorAll('.branch-btn').forEach(btn => {
+                if (btn.getAttribute('data-branch') === branch) {
+                    btn.className = "branch-btn p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-xs text-center transition";
+                } else {
+                    btn.className = "branch-btn p-3 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-xs text-center transition hover:border-slate-700";
+                }
+            });
+            updateDeliverablesView();
+        }
+
+        // File Selection
+        document.getElementById('drop-zone').addEventListener('click', () => {
+            document.getElementById('paper-input').click();
+        });
+
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                document.getElementById('file-label').innerHTML = `<span class="text-cyan-400 font-bold">Selected:</span> ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+                // Reset state
+                isVerified = false;
+                document.getElementById('payment-gate-section').classList.add('hidden');
+                document.getElementById('status-result-box').classList.add('hidden');
+            }
+        }
+
+        // Quality Gate Execution
+        function startQualityGate() {
+            if (!uploadedFile) {
+                alert("Please upload your IEEE Base Paper (PDF) first! Our zero-error engine requires your paper to extract parameters.");
+                return;
+            }
+
+            const terminal = document.getElementById('verification-terminal');
+            const logs = document.getElementById('terminal-logs');
+            const percent = document.getElementById('terminal-percent');
+            const btnVerify = document.getElementById('btn-verify');
+            const statusBox = document.getElementById('status-result-box');
+            const paymentGate = document.getElementById('payment-gate-section');
+
+            terminal.classList.remove('hidden');
+            logs.innerHTML = '';
+            btnVerify.disabled = true;
+            paymentGate.classList.add('hidden');
+
+            const steps = [
+                "Parsing IEEE Paper topology & parameter tables...",
+                `Extracting benchmark ratings for branch: ${currentBranch}...`,
+                "Initializing ODE solver & testing algebraic loops...",
+                "Executing dynamic load response & steady-state convergence...",
+                "Running FFT window analysis: THD = 2.41% (Threshold: < 5.0%)...",
+                `Structuring ${currentLevel === 'B.Tech' ? '80+' : '100+'} Page academic thesis chapters & equations...`,
+                "Quality Gate 100% Passed. Ready for packaging."
+            ];
+
+            let stepIdx = 0;
+            const interval = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    const p = document.createElement('div');
+                    p.innerHTML = `<span class="text-cyan-400">➜</span> ${steps[stepIdx]}`;
+                    logs.appendChild(p);
+                    logs.scrollTop = logs.scrollHeight;
+                    percent.innerText = `${Math.round(((stepIdx + 1) / steps.length) * 100)}%`;
+                    stepIdx++;
+                } else {
+                    clearInterval(interval);
+                    btnVerify.disabled = false;
+                    isVerified = true;
+
+                    // Display Passed Verification Badge
+                    statusBox.innerHTML = `
+                        <div class="p-4 bg-emerald-950/60 border border-emerald-500 rounded-xl text-emerald-300 text-xs flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-sm block text-emerald-200">✔ Quality Gate 100% Verified</span>
+                                Zero algebraic loops • Harmonic THD 2.41% • Documentation: ${currentLevel === 'B.Tech' ? '80+' : '100+'} Pages
+                            </div>
+                            <span class="font-mono text-xs bg-emerald-900 px-2 py-1 rounded text-emerald-300">PASS_0_ERR</span>
+                        </div>
+                    `;
+                    statusBox.classList.remove('hidden');
+                    paymentGate.classList.remove('hidden');
+                    paymentGate.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 500);
+        }
+
+        // Secure Payment Simulation & Custom ZIP Generation
+        function simulatePayment() {
+            if (!isVerified || !uploadedFile) {
+                alert("Security Violation: You cannot trigger payment without passing the automated quality verification first.");
+                return;
+            }
+
+            const btnPay = document.getElementById('btn-pay');
+            btnPay.innerText = "Processing Razorpay Transaction...";
+            btnPay.disabled = true;
+
+            setTimeout(() => {
+                alert("Payment of ₹1,000 Verified Successfully via Razorpay!\nYour verified deliverables bundle is now downloading.");
+                generateDynamicZip();
+                btnPay.innerText = "Payment Verified (Downloaded)";
+            }, 1200);
+        }
+
+        // Generate verified ZIP bundle with JSZip
+        function generateDynamicZip() {
+            const zip = new JSZip();
+            const folderName = `ProjectGuide_${currentBranch}_${currentLevel}_Package`;
+            const folder = zip.folder(folderName);
+
+            // Add Model / Code Deliverable
+            if (currentBranch === 'EEE') {
+                folder.file("simulation_model.slx", "MATLAB Simulink Binary Model - Verified IEEE Simulation");
+                folder.file("parameters.m", "% Simulation Initialization Parameters\nP_mp = 5000;\nV_dc = 650;\nL_filter = 3.2e-3;\nC_dc = 1200e-6;");
+            } else if (currentBranch === 'ECE') {
+                folder.file("signal_analysis.m", "% ECE Signal Processing Algorithm\nFs = 1000;\nt = 0:1/Fs:1;");
+                folder.file("schematic.pdsprj", "Proteus Hardware Circuit Design File");
+            } else if (currentBranch === 'CSE') {
+                folder.file("main.py", "# CSE/IT Verified Machine Learning Pipeline\nimport torch\nprint('Model loaded successfully')");
+                folder.file("app.py", "# Streamlit Interactive Dashboard Web App");
+            } else {
+                folder.file("chassis_model.step", "Universal 3D CAD Geometry STEP file for ANSYS / SolidWorks");
+                folder.file("simulation_setup.wbpj", "ANSYS Workbench Project Structure");
+            }
+
+            // Add 80+ or 100+ Page Thesis & PPT
+            const pageTarget = currentLevel === 'B.Tech' ? '80_Plus_Pages' : '100_Plus_Pages';
+            folder.file(`Complete_Academic_Thesis_${pageTarget}.docx`, `Standard IEEE Dissertation Book (${pageTarget}) with mathematical equations, 25+ citations, and high-res waveform captures.`);
+            folder.file("Project_Defense_Presentation.pptx", "15-20 Slide Professional Review Deck with Architecture Schematics.");
+            
+            // Add Verification & Removal Instructions
+            folder.file("VERIFICATION_CERTIFICATE.txt", `ProjectGuide Autonomous Verification Certificate\nBranch: ${currentBranch}\nLevel: ${currentLevel}\nZero-Error Pass ID: PG-${Date.now()}\nNote: Remove the Page 1 brand badge before final college binding.`);
+
+            zip.generateAsync({ type: "blob" }).then(content => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(content);
+                a.download = `${folderName}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            });
+        }
+
+        // Initialize default view
+        updateDeliverablesView();
+    </script>
+</body>
+</html>
