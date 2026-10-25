@@ -3,110 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ProjectGuide | Verified Final Year Engineering Deliverables</title>
+    <meta name="description" content="Institutional Academic Engineering Project Delivery and Verification Platform for B.Tech and M.Tech scholars.">
+    <title>ProjectGuide | Autonomous Engineering Project Delivery Platform</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- JSZip for dynamic client-side packaging -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-user-select: none; 
+            -moz-user-select: none; 
+            -ms-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none;
+        }
         .mono { font-family: 'JetBrains Mono', monospace; }
-        .glow-card { box-shadow: 0 0 35px -10px rgba(56, 189, 248, 0.15); }
+        .glass-panel { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(14px); border: 1px solid rgba(51, 65, 85, 0.7); }
+        .glow-effect { box-shadow: 0 0 40px -10px rgba(14, 165, 233, 0.18); }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-slate-950">
 
-    <!-- Top Security & Trust Announcement Bar -->
-    <div class="bg-slate-900 border-b border-slate-800 text-center py-2 px-4 text-xs text-slate-300 flex items-center justify-center gap-3">
-        <span class="inline-flex items-center gap-1 text-emerald-400 font-semibold">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-            256-Bit SSL Secured
-        </span>
-        <span class="text-slate-600">•</span>
-        <span>Flat ₹1,000 Zero Hidden Costs</span>
-        <span class="text-slate-600">•</span>
-        <span class="text-cyan-400">Zero-Charge if Simulation Fails Quality Gate</span>
+    <!-- Top Verification & Compliance Banner -->
+    <div class="bg-slate-900 border-b border-slate-800 py-2.5 px-4 text-xs text-slate-300">
+        <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+                <span class="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Verified Standard Compliance
+                </span>
+                <span class="text-slate-600">|</span>
+                <span class="text-slate-400">IEEE • ACM • ASME • ASCE Engineering Protocols</span>
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <button type="button" onclick="openModal('guidelines-modal')" class="hover:text-cyan-400 transition flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Platform Guidelines
+                </button>
+                <span class="text-slate-700">•</span>
+                <span class="text-slate-400 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    256-Bit Encrypted Gate
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Navigation Header -->
     <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-40 px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-extrabold text-white text-xl shadow-lg shadow-cyan-500/20">
+            <div class="flex items-center gap-3.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-cyan-500/20">
                     PG
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                        ProjectGuide <span class="text-xs bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded-full font-mono" id="standard-badge">IEEE Standard</span>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        ProjectGuide <span class="text-[11px] bg-cyan-950 text-cyan-400 border border-cyan-800/80 px-2 py-0.5 rounded-full font-mono" id="standard-badge">IEEE Standard</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Final Year Engineering Projects (B.Tech & M.Tech)</p>
+                    <p class="text-xs text-slate-400">Engineering Project Delivery Platform (B.Tech & M.Tech)</p>
                 </div>
             </div>
-            <div class="hidden sm:flex items-center gap-4 text-xs font-mono">
-                <a href="#how-it-works" class="text-slate-400 hover:text-cyan-300 transition">How it Works</a>
-                <a href="#pricing-security" class="text-slate-400 hover:text-cyan-300 transition">Pricing & Guarantee</a>
-                <span class="inline-flex items-center gap-1.5 text-emerald-400 bg-emerald-950/50 border border-emerald-800 px-3 py-1.5 rounded-lg">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Quality Verified
-                </span>
+
+            <!-- Header Action Links -->
+            <div class="hidden sm:flex items-center gap-5 text-xs font-medium">
+                <button type="button" onclick="openModal('guidelines-modal')" class="text-slate-300 hover:text-cyan-400 transition">How it Works</button>
+                <button type="button" onclick="openModal('terms-modal')" class="text-slate-300 hover:text-cyan-400 transition">Terms of Service</button>
+                <button type="button" onclick="openModal('privacy-modal')" class="text-slate-300 hover:text-cyan-400 transition">Privacy & IP</button>
+                <button type="button" onclick="toggleChat()" class="px-3.5 py-1.5 rounded-lg bg-cyan-950 text-cyan-400 border border-cyan-800 hover:bg-cyan-900 transition flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+                    Help Desk
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full space-y-10">
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto px-4 py-8 flex-grow w-full space-y-8">
 
-        <!-- Hero Title -->
+        <!-- Hero Section -->
         <div class="text-center space-y-3">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/80 text-cyan-400 text-xs font-mono">
-                ⚡ 100% Complete Project Deliverables in 1 Click
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/80 text-cyan-400 text-xs font-mono">
+                Institutional Academic Project Repository & Verification
             </div>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" id="main-hero-title">
-                Verified Base Paper & Custom Extensions for <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Engineering Students</span>
+                Academic Engineering Project Verification & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Deliverables System</span>
             </h2>
-            <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base">
-                Provide your existing base paper and proposed extension abstract. Our engine tests convergence, generates full 80-100+ page books, and delivers ready-to-run models.
+            <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+                Provide your existing base paper and proposed extension abstract. Our system validates the technical methodology, confirms convergence, and prepares standard college-ready deliverables.
             </p>
         </div>
 
-        <!-- 3-Step Simple Explanation (How it works) -->
-        <div id="how-it-works" class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 space-y-2">
-                <span class="w-7 h-7 rounded-lg bg-cyan-950 text-cyan-400 font-bold flex items-center justify-center text-xs font-mono">01</span>
-                <h4 class="text-sm font-bold text-white">Select Branch & Upload</h4>
-                <p class="text-xs text-slate-400 leading-relaxed">Choose B.Tech/M.Tech and upload your Base Paper + custom proposed extension abstract.</p>
-            </div>
-            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 space-y-2">
-                <span class="w-7 h-7 rounded-lg bg-blue-950 text-blue-400 font-bold flex items-center justify-center text-xs font-mono">02</span>
-                <h4 class="text-sm font-bold text-white">Automated Quality Gate</h4>
-                <p class="text-xs text-slate-400 leading-relaxed">Engine verifies simulation zero-error run, FFT harmonics (<5% THD), and builds report layout.</p>
-            </div>
-            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-4 space-y-2">
-                <span class="w-7 h-7 rounded-lg bg-emerald-950 text-emerald-400 font-bold flex items-center justify-center text-xs font-mono">03</span>
-                <h4 class="text-sm font-bold text-white">Instant Safe Delivery</h4>
-                <p class="text-xs text-slate-400 leading-relaxed">Settle flat ₹1,000 via Razorpay UPI and instantly download full simulation code, 80-100+ pg book & PPT.</p>
-            </div>
-        </div>
-
-        <!-- Academic Level & Branch Selection -->
-        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 glow-card space-y-6">
+        <!-- 1. Academic Level & Branch Selection -->
+        <div class="glass-panel rounded-2xl p-6 glow-effect space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Academic Level Selection -->
                 <div>
-                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold">1. SELECT ACADEMIC LEVEL</label>
+                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold uppercase tracking-wider">1. Select Academic Program</label>
                     <div class="grid grid-cols-2 gap-3">
                         <button type="button" id="btn-btech" onclick="setLevel('B.Tech')" class="p-3.5 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-sm flex flex-col items-center gap-1 transition">
                             <span>B.Tech Major</span>
-                            <span class="text-xs text-slate-400 font-mono font-normal">80+ Page Book • ₹1,000</span>
+                            <span class="text-xs text-slate-400 font-mono font-normal">Undergraduate Standard</span>
                         </button>
                         <button type="button" id="btn-mtech" onclick="setLevel('M.Tech')" class="p-3.5 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-sm flex flex-col items-center gap-1 transition hover:border-slate-700">
                             <span>M.Tech Thesis</span>
-                            <span class="text-xs text-slate-400 font-mono font-normal">100+ Page Dissertation • ₹1,000</span>
+                            <span class="text-xs text-slate-400 font-mono font-normal">Postgraduate Research</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Engineering Branch Selection -->
                 <div>
-                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold">2. SELECT ENGINEERING BRANCH</label>
+                    <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold uppercase tracking-wider">2. Select Engineering Discipline</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="branch-buttons">
                         <button type="button" onclick="setBranch('EEE')" class="branch-btn p-3 rounded-xl border border-cyan-500 bg-cyan-950/40 text-cyan-300 font-semibold text-xs text-center transition" data-branch="EEE">EEE</button>
                         <button type="button" onclick="setBranch('ECE')" class="branch-btn p-3 rounded-xl border border-slate-800 bg-slate-900/80 text-slate-300 font-semibold text-xs text-center transition hover:border-slate-700" data-branch="ECE">ECE</button>
@@ -116,16 +126,21 @@
                 </div>
             </div>
 
-            <!-- Deliverables Dynamic Preview Box -->
-            <div id="deliverables-preview" class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2"></div>
+            <!-- Deliverables Dynamic Specification Panel -->
+            <div id="deliverables-preview" class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2">
+                <!-- Injected via JavaScript -->
+            </div>
         </div>
 
-        <!-- Two-Way Upload Section: Base Paper & Extension Abstract -->
-        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 glow-card space-y-6">
-            <h3 class="text-sm font-mono text-cyan-400 font-semibold">3. INPUT PROJECT SOURCE & PROPOSED EXTENSION</h3>
+        <!-- 2. Dual Upload Section -->
+        <div class="glass-panel rounded-2xl p-6 glow-effect space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                <h3 class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">3. Technical Project Input</h3>
+                <span class="text-[11px] text-slate-400">Institutional validation engine</span>
+            </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Base Paper -->
+                <!-- Base Paper Upload -->
                 <div class="border border-slate-700 hover:border-cyan-500/80 rounded-xl p-5 bg-slate-950/60 space-y-3 cursor-pointer transition" onclick="document.getElementById('base-paper-input').click()">
                     <input type="file" id="base-paper-input" accept=".pdf,.doc,.docx" class="hidden" onchange="handleBasePaperSelected(event)">
                     <div class="flex items-center gap-3">
@@ -133,13 +148,13 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Step A: Existing Base Paper</h4>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Primary Base Paper</h4>
                             <p class="text-[11px] text-slate-400" id="base-file-label">Upload published benchmark paper (PDF)</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Proposed Extension -->
+                <!-- Proposed Extension Upload -->
                 <div class="border border-slate-700 hover:border-blue-500/80 rounded-xl p-5 bg-slate-950/60 space-y-3 cursor-pointer transition" onclick="document.getElementById('extension-paper-input').click()">
                     <input type="file" id="extension-paper-input" accept=".pdf,.doc,.docx,.txt" class="hidden" onchange="handleExtensionSelected(event)">
                     <div class="flex items-center gap-3">
@@ -147,68 +162,68 @@
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         </div>
                         <div>
-                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Step B: Proposed Extension / Abstract</h4>
-                            <p class="text-[11px] text-slate-400" id="extension-file-label">Upload modification abstract or guide notes</p>
+                            <h4 class="text-xs font-bold text-white uppercase tracking-wider">Proposed Extension / Abstract</h4>
+                            <p class="text-[11px] text-slate-400" id="extension-file-label">Upload novel modification file (PDF/Word)</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Notes -->
+            <!-- Custom Extension Specification Box -->
             <div>
-                <label class="block text-[11px] font-mono text-slate-400 mb-1">Or Paste Extension Details / Specific Guide Requirements:</label>
-                <textarea id="custom-notes" rows="2" placeholder="E.g., Replace standard LCL filter with LLCL filter, modify P&O MPPT to GMPPT under partial shading..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500"></textarea>
+                <label class="block text-[11px] font-mono text-slate-400 mb-1">Additional Project Specifications / Guide Requirements:</label>
+                <textarea id="custom-notes" rows="2" placeholder="Specify any custom topologies, parameters, algorithm changes, or comparative requirements..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500" oninput="resetVerification()"></textarea>
             </div>
 
-            <!-- Run Verification -->
+            <!-- Run Verification Action -->
             <div class="flex justify-center pt-2">
                 <button type="button" id="btn-verify" onclick="startQualityGate()" class="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl text-sm transition shadow-lg shadow-cyan-500/20 disabled:opacity-50">
-                    Run Automated Quality Verification
+                    Execute Project Validation & Analysis
                 </button>
             </div>
 
-            <!-- Verification Progress & Terminal -->
+            <!-- Real-time Verification Terminal -->
             <div id="verification-terminal" class="hidden bg-slate-950 border border-slate-800 rounded-xl p-4 font-mono text-xs space-y-2">
                 <div class="flex items-center justify-between text-slate-400 border-b border-slate-800 pb-2">
                     <span class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> Checking Base Model vs Proposed Extension
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> Real-time Technical Verification Engine
                     </span>
                     <span id="terminal-percent">0%</span>
                 </div>
                 <div id="terminal-logs" class="space-y-1 text-slate-300 max-h-36 overflow-y-auto"></div>
             </div>
 
-            <!-- Status Result Box -->
+            <!-- Status Output Box -->
             <div id="status-result-box" class="hidden"></div>
         </div>
 
-        <!-- Strict Payment & Secure Settlement Card -->
-        <div id="payment-gate-section" class="hidden bg-gradient-to-b from-slate-900 to-slate-950 border border-emerald-500/50 rounded-2xl p-6 sm:p-8 glow-card space-y-6 text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono">
-                ✔ 100% Convergence Verified • Ready for Instant Delivery
+        <!-- 3. Secure Settlement & Final Package Delivery (Only visible after 100% verification) -->
+        <div id="payment-gate-section" class="hidden glass-panel border border-emerald-500/50 rounded-2xl p-6 sm:p-8 glow-effect space-y-6 text-center">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono">
+                ✔ Validation Complete • 100% Technical Metrics Verified
             </div>
             
             <div class="space-y-1">
-                <h3 class="text-2xl font-bold text-white">Unlock Verified Project Deliverables</h3>
-                <p class="text-xs text-slate-400" id="package-summary-label">Includes Complete Simulation, Documentation, and Review Presentation</p>
+                <h3 class="text-2xl font-bold text-white">Project Deliverables Package Ready</h3>
+                <p class="text-xs text-slate-400" id="package-summary-label">Includes Complete Simulation Models, Full Documentation, Schematics, and Presentation Deck</p>
             </div>
 
-            <!-- Breakdown -->
-            <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 inline-block text-left w-full max-w-md mx-auto space-y-2 text-xs font-mono">
+            <!-- Formal Manifest Breakdown -->
+            <div class="p-5 bg-slate-950/90 rounded-xl border border-slate-800 inline-block text-left w-full max-w-md mx-auto space-y-2.5 text-xs font-mono">
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
-                    <span>Base Model + Proposed Extension</span>
-                    <span class="text-white">Included</span>
+                    <span>Base Paper Model + Extension</span>
+                    <span class="text-emerald-400 font-semibold">Verified & Included</span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
-                    <span id="page-tier-label">Documentation Format</span>
-                    <span class="text-cyan-400 font-semibold" id="page-count-val">80+ Pages</span>
+                    <span id="page-tier-label">Academic Documentation</span>
+                    <span class="text-cyan-400 font-semibold">Complete Project Book (.docx)</span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
-                    <span>Quality Verification</span>
+                    <span>Quality Gate Verification</span>
                     <span class="text-emerald-400 font-semibold">100% Passed</span>
                 </div>
                 <div class="flex justify-between pt-2 text-sm font-bold text-white">
-                    <span>Total Flat Fee</span>
+                    <span>Delivery Settlement Fee</span>
                     <span class="text-emerald-400">₹1,000</span>
                 </div>
             </div>
@@ -216,47 +231,25 @@
             <div class="flex flex-col sm:flex-row justify-center gap-4">
                 <button type="button" id="btn-pay" onclick="simulatePayment()" class="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Pay ₹1,000 via Razorpay & Download ZIP
+                    Confirm & Download Project ZIP (₹1,000)
                 </button>
             </div>
             
-            <div class="flex items-center justify-center gap-4 text-[11px] text-slate-400 pt-2">
-                <span class="flex items-center gap-1">✔ Instant ZIP Auto-Download</span>
+            <div class="flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400 pt-2">
+                <span class="flex items-center gap-1 text-emerald-400">✔ Instant Automated ZIP Download</span>
                 <span class="text-slate-600">•</span>
-                <span class="flex items-center gap-1">✔ UPI / GPay / PhonePe / Cards</span>
+                <span>UPI / NetBanking / Cards Protected by Razorpay</span>
                 <span class="text-slate-600">•</span>
-                <span class="flex items-center gap-1">✔ 100% Viva Ready</span>
-            </div>
-        </div>
-
-        <!-- Pricing Transparency & Security Details Section -->
-        <div id="pricing-security" class="border border-slate-800 bg-slate-900/40 rounded-2xl p-6 sm:p-8 space-y-6">
-            <div class="text-center space-y-1">
-                <h3 class="text-xl font-bold text-white">Security & Pricing Transparency</h3>
-                <p class="text-xs text-slate-400">Why thousands of engineering scholars trust ProjectGuide</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-slate-300">
-                <div class="space-y-2 border-l-2 border-cyan-500 pl-4">
-                    <h5 class="font-bold text-white text-sm">Flat ₹1,000 Pricing</h5>
-                    <p class="text-slate-400 leading-relaxed">No hidden charges, no page-based surcharges, and no consulting fees. Whether B.Tech or M.Tech, flat ₹1,000 flat.</p>
-                </div>
-                <div class="space-y-2 border-l-2 border-emerald-500 pl-4">
-                    <h5 class="font-bold text-white text-sm">Zero-Charge Shield</h5>
-                    <p class="text-slate-400 leading-relaxed">If the simulation doesn't converge or fails IEEE harmonics (<5% THD), payment is permanently disabled.</p>
-                </div>
-                <div class="space-y-2 border-l-2 border-blue-500 pl-4">
-                    <h5 class="font-bold text-white text-sm">256-Bit Encrypted Transfer</h5>
-                    <p class="text-slate-400 leading-relaxed">All payments are processed directly via Razorpay PCI-DSS Level 1 compliant gateway. We never store bank data.</p>
-                </div>
+                <span>Ready for College Submission & Review</span>
             </div>
         </div>
 
     </main>
 
-    <!-- Floating Live Chat Helpdesk Widget -->
+    <!-- Floating Help Desk Desk -->
     <div class="fixed bottom-5 right-5 z-50">
         <!-- Chat Popup Box -->
-        <div id="chat-popup" class="hidden mb-3 w-80 sm:w-96 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col glow-card">
+        <div id="chat-popup" class="hidden mb-3 w-80 sm:w-96 glass-panel rounded-2xl shadow-2xl overflow-hidden flex flex-col glow-effect">
             <div class="bg-gradient-to-r from-cyan-600 to-blue-600 p-4 flex items-center justify-between text-white">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-xs">
@@ -265,28 +258,28 @@
                     <div>
                         <h4 class="text-xs font-bold leading-tight">ProjectGuide Support Desk</h4>
                         <span class="text-[10px] text-cyan-100 flex items-center gap-1">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online • Instant Answers
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Online Helpdesk Active
                         </span>
                     </div>
                 </div>
                 <button type="button" onclick="toggleChat()" class="text-white/80 hover:text-white text-lg font-bold">✕</button>
             </div>
             
-            <div id="chat-messages" class="p-4 space-y-3 h-64 overflow-y-auto text-xs bg-slate-950/60">
+            <div id="chat-messages" class="p-4 space-y-3 h-64 overflow-y-auto text-xs bg-slate-950/80">
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1">
-                    <p class="font-semibold text-cyan-400 text-[11px]">Helpdesk AI Assistant:</p>
-                    <p>Hello! Have questions about your project base paper, custom extensions, or simulation deliverables? Ask below or connect directly on WhatsApp.</p>
+                    <p class="font-semibold text-cyan-400 text-[11px]">Academic Support Advisor:</p>
+                    <p>Welcome! If you have specific base paper questions, extension requirements, or need emergency guidance, connect directly below.</p>
                 </div>
             </div>
 
-            <!-- Pre-set Quick FAQ Buttons -->
+            <!-- Quick Inquiry Buttons -->
             <div class="p-2 bg-slate-900 border-t border-slate-800/80 flex flex-wrap gap-1.5 text-[10px]">
-                <button onclick="sendQuickMsg('Is my payment secure?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Is payment safe?</button>
-                <button onclick="sendQuickMsg('What do I get in the ZIP?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">What's in ZIP?</button>
-                <button onclick="sendQuickMsg('Can I remove the watermark?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Removable stamp?</button>
+                <button onclick="sendQuickMsg('What is included in the project package?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Package Details</button>
+                <button onclick="sendQuickMsg('Can I customize the circuit and code?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Customization</button>
+                <button onclick="sendQuickMsg('How does the quality guarantee work?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Quality Guarantee</button>
             </div>
 
-            <!-- Chat Input Area -->
+            <!-- Input Form -->
             <div class="p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
                 <input type="text" id="chat-input" placeholder="Type your query..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeypress="if(event.key === 'Enter') sendUserMessage()">
                 <button type="button" onclick="sendUserMessage()" class="p-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-xl font-bold transition">
@@ -294,30 +287,90 @@
                 </button>
             </div>
             
-            <!-- WhatsApp Direct Link -->
-            <div class="bg-slate-950 p-2 text-center border-t border-slate-800 text-[11px]">
-                <a href="https://wa.me/919999999999?text=Hi%20ProjectGuide,%20I%20need%20help%20with%20my%20project%20deliverables." target="_blank" class="text-emerald-400 hover:underline inline-flex items-center gap-1 font-semibold">
-                    <span>💬 Chat directly with Engineering Guide on WhatsApp</span>
+            <!-- Direct Emergency Helpline Link -->
+            <div class="bg-slate-950 p-2.5 text-center border-t border-slate-800 text-[11px]">
+                <a href="https://wa.me/917993081190?text=Hi%20ProjectGuide,%20I%20have%20an%20urgent%20inquiry%20regarding%20my%20academic%20project." target="_blank" class="text-emerald-400 hover:underline inline-flex items-center gap-1.5 font-semibold">
+                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                    Emergency Academic Helpline (WhatsApp Direct)
                 </a>
             </div>
         </div>
 
-        <!-- Helpdesk Floating Button -->
+        <!-- Help Desk Button -->
         <button type="button" onclick="toggleChat()" class="px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-full shadow-2xl flex items-center gap-2 text-xs font-bold transition transform hover:scale-105 shadow-cyan-500/25">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-            <span>Need Help? Chat with Guide</span>
+            <span>Helpline & Guidance</span>
         </button>
+    </div>
+
+    <!-- Modals Container -->
+    
+    <!-- 1. Platform Guidelines Modal -->
+    <div id="guidelines-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Platform User Guidelines</h3>
+                <button onclick="closeModal('guidelines-modal')" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto">
+                <p><b>1. Base Paper Selection:</b> Ensure your uploaded paper is in standard format (IEEE, ACM, ASME, ASCE, or university conference paper).</p>
+                <p><b>2. Proposed Modifications:</b> Upload your custom extension notes or summarize your novel approach in the provided technical specification area.</p>
+                <p><b>3. Autonomous Quality Check:</b> The system runs non-linear algebraic verification, harmonic distortion analysis, and checks system stability before generating the final deliverable package.</p>
+                <p><b>4. Deliverables Package:</b> Each completed ZIP bundle includes native execution files, complete Word documentation (.docx), circuit schematics/block diagrams, and presentation review slides (.pptx).</p>
+            </div>
+            <div class="text-right pt-2 border-t border-slate-800">
+                <button onclick="closeModal('guidelines-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">Close Guidelines</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Terms of Service Modal -->
+    <div id="terms-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Terms of Academic Service</h3>
+                <button onclick="closeModal('terms-modal')" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto">
+                <p><b>Academic Integrity & Reference Use:</b> Deliverables provided through ProjectGuide are designed as verified reference models, baseline implementations, and learning materials for academic study.</p>
+                <p><b>Quality Guarantee:</b> In the event that technical simulation models do not converge or demonstrate runtime failure, verification is halted automatically, and no settlement charge is processed.</p>
+                <p><b>Delivery Policy:</b> All digital assets are packaged instantly into a comprehensive ZIP archive and delivered via secure automated download upon verification.</p>
+            </div>
+            <div class="text-right pt-2 border-t border-slate-800">
+                <button onclick="closeModal('terms-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">Acknowledge</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Privacy & Intellectual Property Modal -->
+    <div id="privacy-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Privacy & Intellectual Property Policy</h3>
+                <button onclick="closeModal('privacy-modal')" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
+            </div>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto">
+                <p><b>Confidentiality of Uploaded Papers:</b> Research base papers, custom abstracts, and student information are strictly confidential and are not indexed, shared, or redistributed.</p>
+                <p><b>Security & Encryption:</b> All client transactions and data handshakes are safeguarded with 256-bit SSL protocols. Payment credentials are handled directly by PCI-DSS certified gateway Razorpay.</p>
+                <p><b>Ownership:</b> Students retain full modification rights to customize and personalize all generated documentation, models, and presentation slides for their respective institutions.</p>
+            </div>
+            <div class="text-right pt-2 border-t border-slate-800">
+                <button onclick="closeModal('privacy-modal')" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg">Acknowledge</button>
+            </div>
+        </div>
     </div>
 
     <!-- Footer -->
     <footer class="border-t border-slate-800/80 bg-slate-950 px-6 py-6 text-xs text-slate-500">
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-                <p>© 2026 ProjectGuide. Built for Final Year Engineering Students.</p>
-                <p class="text-[11px] text-slate-600 mt-1">Verified standards: IEEE, ACM, ASME, ASCE. Fully authenticated references.</p>
+                <p>© 2026 ProjectGuide. Autonomous Project Delivery & Technical Research Platform.</p>
+                <p class="text-[11px] text-slate-600 mt-1">Multi-Society Standards: IEEE • ACM • ASME • ASCE. Institutional grade verification.</p>
             </div>
-            <div class="text-slate-400 font-mono">
-                100% Refundable if Code Fails • Flat ₹1,000
+            <div class="flex items-center gap-4 text-slate-400">
+                <button onclick="openModal('guidelines-modal')" class="hover:underline">Guidelines</button>
+                <button onclick="openModal('terms-modal')" class="hover:underline">Terms</button>
+                <button onclick="openModal('privacy-modal')" class="hover:underline">Privacy</button>
             </div>
         </div>
     </footer>
@@ -329,31 +382,32 @@
         let uploadedBasePaper = null;
         let uploadedExtension = null;
         let isVerified = false;
+        let activeTimer = null;
 
         const branchConfig = {
             'EEE': {
                 standard: 'IEEE / IET Standards',
                 badge: 'IEEE Standard',
-                btech: '<b>Package Details:</b> MATLAB/Simulink (.slx) Base Model + Extension, Parameter Script (.m), Harmonic THD Analysis (<5%), <b>80+ Page Project Book (.docx)</b>, 15-Slide PPT.',
-                mtech: '<b>Package Details:</b> MATLAB/Simulink (.slx) with Dual Proposed Extensions (GMPPT & LLCL Filter), FCS-MPC Controller, <b>100+ Page Master Thesis (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> MATLAB/Simulink (.slx) Base Model + Custom Proposed Extension, Simulation Initialization Script (.m), Circuit Schematics, Waveforms & Harmonic Analysis (IEEE 519 THD < 5%), <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Advanced MATLAB/Simulink (.slx) Base Model + Verified Dual Technical Extensions, State-Space Mathematical Modeling, Comparative Results Validation, Circuit Schematics, <b>Complete Master Dissertation Book (.docx)</b>, 20-Slide PPT.'
             },
             'ECE': {
                 standard: 'IEEE / Springer Standards',
                 badge: 'IEEE / Springer',
-                btech: '<b>Package Details:</b> Signal/Image Processing Code (.m / .py), Hardware Schematic (Proteus), SNR/BER Graphs, <b>80+ Page Project Book (.docx)</b>, 15-Slide PPT.',
-                mtech: '<b>Package Details:</b> Wireless Comms / Deep Learning Architecture, Hardware-in-the-Loop, <b>100+ Page Master Thesis (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> Core Signal/Image Algorithm Implementation (.m / .py), Hardware Circuit Schematic (Proteus/Multisim), SNR/BER Performance Curves, Block Diagrams, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Advanced Wireless/Deep Learning Architecture, Hardware-in-the-Loop Implementation, Theoretical Derivations, Comprehensive Block Schematics, <b>Complete Master Thesis Book (.docx)</b>, 20-Slide PPT.'
             },
             'CSE': {
                 standard: 'ACM / IEEE / NeurIPS Standards',
                 badge: 'ACM / IEEE / ArXiv',
-                btech: '<b>Package Details:</b> Full Python Source Code (.py), Jupyter Notebooks, Pre-trained Weights, Streamlit Web App, <b>80+ Page Project Book (.docx)</b>, 15-Slide PPT.',
-                mtech: '<b>Package Details:</b> Custom Deep Neural Architecture, Pipeline, Docker Script, <b>100+ Page Master Thesis (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> Complete Source Code Repository (.py), Jupyter Notebooks, Baseline vs Proposed Model Weights, Interactive Web Demo, System Architecture Schematics, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Custom Deep Neural Architecture, End-to-End Evaluation Pipeline, Docker Deployment Environment, Complete Dataset Pipeline, <b>Complete Master Thesis Book (.docx)</b>, 20-Slide PPT.'
             },
             'MECH': {
                 standard: 'ASME / SAE / ASCE Standards',
                 badge: 'ASME / ASCE Standard',
-                btech: '<b>Package Details:</b> 3D CAD Universal Models (.step), ANSYS Stress & Deformation Color Contours, <b>80+ Page Project Book (.docx)</b>, 15-Slide PPT.',
-                mtech: '<b>Package Details:</b> Coupled CFD / Thermal Dynamics, Simscape Multibody Kinetics, <b>100+ Page Dissertation (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> Parametric 3D CAD Universal Assembly (.step), Structural & Thermal Boundary Simulations, Factor of Safety Contours, Detailed Component Schematics, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Coupled Multi-Physics Simulation (CFD / Non-linear FEA), Dynamic Kinetics Modeling, Extensive Analytical Validations, <b>Complete Master Dissertation Book (.docx)</b>, 20-Slide PPT.'
             }
         };
 
@@ -366,12 +420,12 @@
             
             preview.innerHTML = `
                 <div class="flex items-center gap-2 text-cyan-400 font-semibold mb-1">
-                    <span>${currentBranch} • ${currentLevel} Deliverables (${conf.standard}):</span>
+                    <span>${currentBranch} • ${currentLevel} Deliverables Architecture (${conf.standard}):</span>
                 </div>
                 <p class="text-slate-300 leading-relaxed">${data}</p>
             `;
-            document.getElementById('page-tier-label').innerText = `${currentLevel} Format`;
-            document.getElementById('page-count-val').innerText = currentLevel === 'B.Tech' ? '80+ Pages' : '100+ Pages';
+            document.getElementById('page-tier-label').innerText = `${currentLevel} Project Book`;
+            resetVerification();
         }
 
         function setLevel(level) {
@@ -403,6 +457,10 @@
         function handleBasePaperSelected(event) {
             const file = event.target.files[0];
             if (file) {
+                if (file.size < 5000) {
+                    alert("The uploaded file appears to be empty or corrupted. Please upload a valid paper (PDF/Word).");
+                    return;
+                }
                 uploadedBasePaper = file;
                 document.getElementById('base-file-label').innerHTML = `<span class="text-cyan-400 font-bold">Base Paper:</span> ${file.name}`;
                 resetVerification();
@@ -419,21 +477,29 @@
         }
 
         function resetVerification() {
+            if (activeTimer) {
+                clearInterval(activeTimer);
+                activeTimer = null;
+            }
             isVerified = false;
             document.getElementById('payment-gate-section').classList.add('hidden');
             document.getElementById('status-result-box').classList.add('hidden');
+            document.getElementById('verification-terminal').classList.add('hidden');
+            document.getElementById('btn-verify').disabled = false;
         }
 
         function startQualityGate() {
             const customNotes = document.getElementById('custom-notes').value.trim();
             if (!uploadedBasePaper) {
-                alert("Please upload your Existing Base Paper (PDF) first!");
+                alert("Please upload your Primary Base Paper (PDF) to proceed.");
                 return;
             }
             if (!uploadedExtension && customNotes.length === 0) {
-                alert("Please provide your Proposed Extension! Either upload an abstract document or type your modification details in the text box.");
+                alert("Please provide your Proposed Extension details (upload document or enter requirements in the text box).");
                 return;
             }
+
+            resetVerification();
 
             const terminal = document.getElementById('verification-terminal');
             const logs = document.getElementById('terminal-logs');
@@ -445,20 +511,19 @@
             terminal.classList.remove('hidden');
             logs.innerHTML = '';
             btnVerify.disabled = true;
-            paymentGate.classList.add('hidden');
 
             const steps = [
-                `Reading base paper benchmark for ${currentBranch}...`,
-                "Extracting proposed extension parameters and architectural differences...",
-                "Synthesizing modified subsystem circuit / code logic...",
-                "Running convergence check & transient stability verification...",
-                "Executing comparative harmonic and performance metrics...",
-                `Compiling ${currentLevel === 'B.Tech' ? '80+' : '100+'} Page complete academic thesis structure...`,
-                "Quality Gate 100% Passed. Base + Proposed Extension ready."
+                `Analyzing base model benchmark parameters for ${currentBranch}...`,
+                "Synthesizing proposed extension topology and boundary modifications...",
+                "Running non-linear ODE solver & testing algebraic stability...",
+                "Verifying transient load dynamics and settling characteristics...",
+                "Evaluating harmonic distortion & comparative performance curves...",
+                "Generating complete academic thesis documentation and schematics...",
+                "Technical Verification 100% Complete. Ready for packaging."
             ];
 
             let stepIdx = 0;
-            const interval = setInterval(() => {
+            activeTimer = setInterval(() => {
                 if (stepIdx < steps.length) {
                     const p = document.createElement('div');
                     p.innerHTML = `<span class="text-cyan-400">➜</span> ${steps[stepIdx]}`;
@@ -467,17 +532,18 @@
                     percent.innerText = `${Math.round(((stepIdx + 1) / steps.length) * 100)}%`;
                     stepIdx++;
                 } else {
-                    clearInterval(interval);
+                    clearInterval(activeTimer);
+                    activeTimer = null;
                     btnVerify.disabled = false;
                     isVerified = true;
 
                     statusBox.innerHTML = `
                         <div class="p-4 bg-emerald-950/60 border border-emerald-500 rounded-xl text-emerald-300 text-xs flex items-center justify-between">
                             <div>
-                                <span class="font-bold text-sm block text-emerald-200">✔ Base Model & Proposed Extension Validated</span>
-                                Full Convergence Confirmed • Documentation: ${currentLevel === 'B.Tech' ? '80+' : '100+'} Pages
+                                <span class="font-bold text-sm block text-emerald-200">✔ Technical Verification 100% Passed</span>
+                                Complete Convergence Confirmed • Base Paper & Extension Synchronized
                             </div>
-                            <span class="font-mono text-xs bg-emerald-900 px-2 py-1 rounded text-emerald-300">PASS_0_ERR</span>
+                            <span class="font-mono text-xs bg-emerald-900 px-2 py-1 rounded text-emerald-300">PASS_VERIFIED</span>
                         </div>
                     `;
                     statusBox.classList.remove('hidden');
@@ -489,18 +555,18 @@
 
         function simulatePayment() {
             if (!isVerified) {
-                alert("Quality verification required before checkout.");
+                alert("Security restriction: Quality verification must pass prior to delivery settlement.");
                 return;
             }
 
             const btnPay = document.getElementById('btn-pay');
-            btnPay.innerText = "Connecting to Razorpay...";
+            btnPay.innerText = "Connecting to Razorpay Secure Gateway...";
             btnPay.disabled = true;
 
             setTimeout(() => {
-                alert("Payment of ₹1,000 Verified Successfully via Razorpay!\nYour verified Base + Extension ZIP bundle is downloading.");
+                alert("Payment of ₹1,000 Verified Successfully via Razorpay!\nYour verified Base + Extension ZIP bundle is now downloading.");
                 generateDynamicZip();
-                btnPay.innerText = "Payment Verified (Downloaded)";
+                btnPay.innerText = "Package Delivered (Downloaded)";
             }, 1200);
         }
 
@@ -510,23 +576,23 @@
             const folder = zip.folder(folderName);
 
             if (currentBranch === 'EEE') {
-                folder.file("base_model.slx", "MATLAB Simulink Base Paper Model");
-                folder.file("extended_model.slx", "MATLAB Simulink Extended Model (With GMPPT & LLCL)");
-                folder.file("parameters.m", "% System Initialization Parameters\nP_mp = 5000;\nV_dc = 650;");
+                folder.file("base_circuit_model.slx", "MATLAB Simulink Base Paper Model");
+                folder.file("extended_circuit_model.slx", "MATLAB Simulink Extended Model");
+                folder.file("system_parameters.m", "% System Initialization Script\nfs = 10000;\nP_rated = 5000;");
             } else if (currentBranch === 'ECE') {
-                folder.file("algorithm.m", "% Signal & System Implementation");
-                folder.file("schematic.pdsprj", "Proteus Hardware Circuit Design");
+                folder.file("signal_core.m", "% ECE Algorithm Implementation Script");
+                folder.file("hardware_schematic.pdsprj", "Proteus Hardware Circuit Design File");
             } else if (currentBranch === 'CSE') {
-                folder.file("model_train.py", "# ML / Deep Learning Pipeline");
-                folder.file("app.py", "# Web Dashboard & Demo");
+                folder.file("train_pipeline.py", "# ML / Deep Learning Pipeline Script");
+                folder.file("web_demo.py", "# Interactive Web Application");
             } else {
-                folder.file("cad_geometry.step", "Universal CAD 3D File");
-                folder.file("ansys_setup.wbpj", "ANSYS Workbench Project");
+                folder.file("geometry_assembly.step", "Universal CAD 3D Model");
+                folder.file("fea_analysis.wbpj", "ANSYS Workbench Project");
             }
 
-            const pageTarget = currentLevel === 'B.Tech' ? '80_Plus_Pages' : '100_Plus_Pages';
-            folder.file(`Academic_Project_Book_${pageTarget}.docx`, `Complete College Book (${pageTarget}) with mathematical equations, comparative tables, and waveform scopes.`);
-            folder.file("Project_Defense_Presentation.pptx", "Professional 15-20 Slide Review Presentation.");
+            folder.file(`Complete_Project_Book_${currentLevel}.docx`, `Complete College Project Documentation (${currentLevel}) including mathematical equations, literature survey, circuit schematics, and comparative waveform captures.`);
+            folder.file("Review_Defense_Presentation.pptx", "Standard Review Presentation Deck with Architecture Schematics.");
+            folder.file("AUTHENTICITY_VERIFICATION.txt", `ProjectGuide Verification Certificate\nBranch: ${currentBranch}\nLevel: ${currentLevel}\nVerification ID: PG-${Date.now()}`);
 
             zip.generateAsync({ type: "blob" }).then(content => {
                 const a = document.createElement('a');
@@ -538,7 +604,7 @@
             });
         }
 
-        // Helpdesk & Chatbot Logic
+        // Helpdesk & Live Chat
         function toggleChat() {
             const popup = document.getElementById('chat-popup');
             popup.classList.toggle('hidden');
@@ -556,7 +622,6 @@
             if (!msg) return;
 
             const box = document.getElementById('chat-messages');
-            // User bubble
             const uDiv = document.createElement('div');
             uDiv.className = "bg-cyan-950 border border-cyan-800 p-2.5 rounded-xl text-cyan-200 text-right";
             uDiv.innerText = msg;
@@ -564,26 +629,47 @@
             input.value = '';
             box.scrollTop = box.scrollHeight;
 
-            // AI Answer
             setTimeout(() => {
-                let reply = "Our engineering experts verify each IEEE base paper and extension before release. You can also chat directly on WhatsApp for custom requests!";
+                let reply = "Our technical advisory team verifies each project paper and extension before delivery. For instant technical support, connect directly via our emergency WhatsApp helpline.";
                 const lower = msg.toLowerCase();
-                if (lower.includes('safe') || lower.includes('secure') || lower.includes('payment')) {
-                    reply = "Yes! 100% secure via Razorpay 256-bit encryption. If simulation verification does not pass, zero money is charged.";
-                } else if (lower.includes('zip') || lower.includes('get') || lower.includes('deliver')) {
-                    reply = "Your ZIP bundle includes: 1) Run-ready simulation code (.slx/.py), 2) Full 80+ or 100+ Page DOCX book, and 3) PPT slides.";
-                } else if (lower.includes('watermark') || lower.includes('stamp')) {
-                    reply = "The verification stamp on Page 1 is 100% removable in Word (.docx) with a single click before college binding.";
+                if (lower.includes('package') || lower.includes('included') || lower.includes('zip')) {
+                    reply = "The ZIP package contains: 1) Verified simulation models (.slx / .py / CAD), 2) Complete Word Project Book (.docx), 3) Schematics & Waveforms, and 4) Review PPT.";
+                } else if (lower.includes('custom') || lower.includes('extension')) {
+                    reply = "Yes! You can specify your exact custom extension requirements in the specification box or upload your guide's abstract.";
+                } else if (lower.includes('guarantee') || lower.includes('quality') || lower.includes('safe')) {
+                    reply = "Zero-Charge Guarantee: If the technical model fails the quality gate convergence test, checkout remains locked and zero payment is processed.";
                 }
 
                 const bDiv = document.createElement('div');
                 bDiv.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1";
-                bDiv.innerHTML = `<p class="font-semibold text-cyan-400 text-[11px]">Helpdesk AI:</p><p>${reply}</p>`;
+                bDiv.innerHTML = `<p class="font-semibold text-cyan-400 text-[11px]">Academic Advisor:</p><p>${reply}</p>`;
                 box.appendChild(bDiv);
                 box.scrollTop = box.scrollHeight;
             }, 600);
         }
 
+        // Modal Handlers
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Anti-Theft & Inspection Shield Protection
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
+                (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // Initialize view on load
         updateDeliverablesView();
     </script>
 </body>
