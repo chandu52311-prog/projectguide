@@ -81,7 +81,7 @@ Rd = {lcl_results['R_damping_Ohm']};             % Passive Damping Resistance (O
 f_res = {lcl_results['f_resonance_Hz']};          % Calculated Resonance Frequency (Hz)
 
 %% --- Current Controller Parameters (PI Tuning via Modulus Optimum) ---
-tau_filter = L1 / (self.v_dc / (2*sqrt(3))); 
+tau_filter = L1 / ({self.v_dc} / (2*sqrt(3)));
 Ti = L1 / 0.1;                   % Integral Time Constant
 Kp_i = L1 / (2 * (1/f_sw));      % Proportional Gain (Current Loop)
 Ki_i = Kp_i / Ti;                % Integral Gain (Current Loop)
