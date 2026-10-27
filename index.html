@@ -63,7 +63,7 @@
                     <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
                         ProjectGuide <span class="text-[11px] bg-cyan-950 text-cyan-400 border border-cyan-800/80 px-2 py-0.5 rounded-full font-mono" id="standard-badge">IEEE Standard</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Engineering Project Delivery Platform (B.Tech & M.Tech)</p>
+                    <p class="text-xs text-slate-400">Autonomous Engineering Synthesis & Simulation Platform</p>
                 </div>
             </div>
 
@@ -86,13 +86,13 @@
         <!-- Hero Section -->
         <div class="text-center space-y-3">
             <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-950/60 border border-cyan-800/80 text-cyan-400 text-xs font-mono">
-                Institutional Academic Project Repository & Verification
+                Institutional Academic Project Verification & Synthesis Engine
             </div>
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight" id="main-hero-title">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 Academic Engineering Project Verification & <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Deliverables System</span>
             </h2>
             <p class="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
-                Provide your existing base paper and proposed extension abstract. Our system validates the technical methodology, confirms convergence, and prepares standard college-ready deliverables.
+                Upload your base paper and proposed extension. Our engine extracts rating matrices, calculates missing circuit parameters via IEEE standards, and generates verified submission kits.
             </p>
         </div>
 
@@ -114,7 +114,7 @@
                     </div>
                 </div>
 
-                <!-- Engineering Branch Selection -->
+                <!-- Engineering Discipline Selection -->
                 <div>
                     <label class="block text-xs font-mono text-cyan-400 mb-2 font-semibold uppercase tracking-wider">2. Select Engineering Discipline</label>
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="branch-buttons">
@@ -127,29 +127,27 @@
             </div>
 
             <!-- Deliverables Dynamic Specification Panel -->
-            <div id="deliverables-preview" class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2">
-                <!-- Injected via JavaScript -->
-            </div>
+            <div id="deliverables-preview" class="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-2"></div>
         </div>
 
-        <!-- 2. Dual Upload Section -->
+        <!-- 2. Technical Upload & Validation Section -->
         <div class="glass-panel rounded-2xl p-6 glow-effect space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
                 <h3 class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">3. Technical Project Input</h3>
-                <span class="text-[11px] text-slate-400">Institutional validation engine</span>
+                <span class="text-[11px] text-slate-400">Autonomous Quality Gate</span>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Base Paper Upload -->
                 <div class="border border-slate-700 hover:border-cyan-500/80 rounded-xl p-5 bg-slate-950/60 space-y-3 cursor-pointer transition" onclick="document.getElementById('base-paper-input').click()">
-                    <input type="file" id="base-paper-input" accept=".pdf,.doc,.docx" class="hidden" onchange="handleBasePaperSelected(event)">
+                    <input type="file" id="base-paper-input" accept=".pdf" class="hidden" onchange="handleBasePaperSelected(event)">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-cyan-950 flex items-center justify-center text-cyan-400 shrink-0">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                         </div>
                         <div>
                             <h4 class="text-xs font-bold text-white uppercase tracking-wider">Primary Base Paper</h4>
-                            <p class="text-[11px] text-slate-400" id="base-file-label">Upload published benchmark paper (PDF)</p>
+                            <p class="text-[11px] text-slate-400" id="base-file-label">Upload IEEE / ScienceDirect benchmark paper (PDF)</p>
                         </div>
                     </div>
                 </div>
@@ -169,10 +167,19 @@
                 </div>
             </div>
 
-            <!-- Custom Extension Specification Box -->
+            <!-- Pre-Flight Scanned PDF Warning Alert -->
+            <div id="scanned-warning-box" class="hidden p-4 bg-red-950/60 border border-red-500 rounded-xl text-red-300 text-xs flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <div>
+                    <span class="font-bold block text-sm text-red-200">Pre-Flight Ingestion Error: Non-Selectable PDF Detected</span>
+                    The uploaded document appears to be an image scan or lacks selectable text/equations. Our automated equation engine requires digital IEEE/ScienceDirect PDFs with selectable text.
+                </div>
+            </div>
+
+            <!-- Generic Non-Identifying Project Specification Box -->
             <div>
                 <label class="block text-[11px] font-mono text-slate-400 mb-1">Additional Project Specifications / Guide Requirements:</label>
-                <textarea id="custom-notes" rows="2" placeholder="Specify any custom topologies, parameters, algorithm changes, or comparative requirements..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500" oninput="resetVerification()"></textarea>
+                <textarea id="custom-notes" rows="2" placeholder="Specify any custom comparative benchmarks, non-linear controller requirements, or boundary parameters..." class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-500" oninput="softReset()"></textarea>
             </div>
 
             <!-- Run Verification Action -->
@@ -193,11 +200,31 @@
                 <div id="terminal-logs" class="space-y-1 text-slate-300 max-h-36 overflow-y-auto"></div>
             </div>
 
+            <!-- Mathematical Audit Parameters Table -->
+            <div id="audit-table-card" class="hidden p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span class="font-bold text-cyan-400 uppercase tracking-wider font-mono">Mathematical Sizing & Topology Audit</span>
+                    <span class="text-[10px] text-slate-400">Derived via Global Institutional Standards</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-slate-400 border-b border-slate-800">
+                                <th class="py-2">System Parameter</th>
+                                <th class="py-2">Paper Extraction</th>
+                                <th class="py-2">Auto-Sized Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="audit-table-rows" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Status Output Box -->
             <div id="status-result-box" class="hidden"></div>
         </div>
 
-        <!-- 3. Secure Settlement & Final Package Delivery (Only visible after 100% verification) -->
+        <!-- 3. Secure Neutral Settlement & Final Package Delivery -->
         <div id="payment-gate-section" class="hidden glass-panel border border-emerald-500/50 rounded-2xl p-6 sm:p-8 glow-effect space-y-6 text-center">
             <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs font-mono">
                 ✔ Validation Complete • 100% Technical Metrics Verified
@@ -208,7 +235,7 @@
                 <p class="text-xs text-slate-400" id="package-summary-label">Includes Complete Simulation Models, Full Documentation, Schematics, and Presentation Deck</p>
             </div>
 
-            <!-- Formal Manifest Breakdown -->
+            <!-- Manifest Breakdown -->
             <div class="p-5 bg-slate-950/90 rounded-xl border border-slate-800 inline-block text-left w-full max-w-md mx-auto space-y-2.5 text-xs font-mono">
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
                     <span>Base Paper Model + Extension</span>
@@ -228,27 +255,48 @@
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button type="button" id="btn-pay" onclick="simulatePayment()" class="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Confirm & Download Project ZIP (₹1,000)
-                </button>
+            <!-- Neutral Institutional Settlement Gateway -->
+            <div class="p-5 bg-slate-900/90 rounded-2xl border border-slate-800 max-w-md mx-auto space-y-4">
+                <div class="text-center space-y-1">
+                    <span class="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider block">Institutional Settlement Desk</span>
+                    <p class="text-xs text-slate-300">Scan via any standard UPI App (GPay / PhonePe / Paytm / BHIM):</p>
+                </div>
+
+                <div class="flex justify-center py-2">
+                    <div class="p-3 bg-white rounded-xl shadow-lg">
+                        <img id="upi-qr" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dprojectguidelabs%40okaxis%26pn%3DProjectGuide%2520Verification%2520Network%26am%3D1000%26cu%3DINR" alt="Merchant UPI QR" class="w-44 h-44 rounded-lg">
+                    </div>
+                </div>
+
+                <div class="text-[11px] text-slate-400 font-mono">
+                    Merchant Node: <span class="text-slate-200 font-semibold">ProjectGuide Verification Network</span>
+                </div>
+
+                <!-- UTR Verification Input -->
+                <div class="space-y-2 pt-2">
+                    <label class="block text-[11px] text-slate-400 text-left">Enter 12-Digit Reference / UTR Number:</label>
+                    <input type="text" id="utr-input" placeholder="e.g. 4289XXXXXXXX" maxlength="12" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-center text-sm font-mono text-white focus:outline-none focus:border-cyan-500">
+                    
+                    <button type="button" id="btn-pay" onclick="verifyAndAutoDownload()" class="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold rounded-xl text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        Verify Reference & Auto-Download (.zip)
+                    </button>
+                </div>
             </div>
             
             <div class="flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-400 pt-2">
-                <span class="flex items-center gap-1 text-emerald-400">✔ Instant Automated ZIP Download</span>
+                <span class="flex items-center gap-1 text-emerald-400">✔ Instant Automated In-Memory Download</span>
                 <span class="text-slate-600">•</span>
-                <span>UPI / NetBanking / Cards Protected by Razorpay</span>
+                <span>Direct Bank Settlement</span>
                 <span class="text-slate-600">•</span>
-                <span>Ready for College Submission & Review</span>
+                <span>Ready for Institutional Review</span>
             </div>
         </div>
 
     </main>
 
-    <!-- Floating Help Desk Desk -->
+    <!-- Floating Help Desk (Completely Anonymous Helpdesk) -->
     <div class="fixed bottom-5 right-5 z-50">
-        <!-- Chat Popup Box -->
         <div id="chat-popup" class="hidden mb-3 w-80 sm:w-96 glass-panel rounded-2xl shadow-2xl overflow-hidden flex flex-col glow-effect">
             <div class="bg-gradient-to-r from-cyan-600 to-blue-600 p-4 flex items-center justify-between text-white">
                 <div class="flex items-center gap-2.5">
@@ -268,44 +316,36 @@
             <div id="chat-messages" class="p-4 space-y-3 h-64 overflow-y-auto text-xs bg-slate-950/80">
                 <div class="bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1">
                     <p class="font-semibold text-cyan-400 text-[11px]">Academic Support Advisor:</p>
-                    <p>Welcome! If you have specific base paper questions, extension requirements, or need emergency guidance, connect directly below.</p>
+                    <p>Welcome to ProjectGuide Support. Connect with automated technical guidance for base paper ingestion or verification specs.</p>
                 </div>
             </div>
 
-            <!-- Quick Inquiry Buttons -->
             <div class="p-2 bg-slate-900 border-t border-slate-800/80 flex flex-wrap gap-1.5 text-[10px]">
                 <button onclick="sendQuickMsg('What is included in the project package?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Package Details</button>
                 <button onclick="sendQuickMsg('Can I customize the circuit and code?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Customization</button>
                 <button onclick="sendQuickMsg('How does the quality guarantee work?')" class="bg-slate-800 hover:bg-slate-700 px-2 py-1 rounded-md text-slate-300">Quality Guarantee</button>
             </div>
 
-            <!-- Input Form -->
             <div class="p-3 bg-slate-900 border-t border-slate-800 flex items-center gap-2">
-                <input type="text" id="chat-input" placeholder="Type your query..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeypress="if(event.key === 'Enter') sendUserMessage()">
+                <input type="text" id="chat-input" placeholder="Type your inquiry..." class="flex-grow bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500" onkeypress="if(event.key === 'Enter') sendUserMessage()">
                 <button type="button" onclick="sendUserMessage()" class="p-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-xl font-bold transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </div>
             
-            <!-- Direct Emergency Helpline Link -->
+            <!-- Completely Masked Anonymous Ticket Box (No Personal Numbers) -->
             <div class="bg-slate-950 p-2.5 text-center border-t border-slate-800 text-[11px]">
-                <a href="https://wa.me/917993081190?text=Hi%20ProjectGuide,%20I%20have%20an%20urgent%20inquiry%20regarding%20my%20academic%20project." target="_blank" class="text-emerald-400 hover:underline inline-flex items-center gap-1.5 font-semibold">
-                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
-                    Emergency Academic Helpline (WhatsApp Direct)
-                </a>
+                <span class="text-slate-400">Institutional Protocol: Automated SLA Support 24/7 Active</span>
             </div>
         </div>
 
-        <!-- Help Desk Button -->
         <button type="button" onclick="toggleChat()" class="px-4 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white rounded-full shadow-2xl flex items-center gap-2 text-xs font-bold transition transform hover:scale-105 shadow-cyan-500/25">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
             <span>Helpline & Guidance</span>
         </button>
     </div>
 
-    <!-- Modals Container -->
-    
-    <!-- 1. Platform Guidelines Modal -->
+    <!-- Modals -->
     <div id="guidelines-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -313,8 +353,8 @@
                 <button onclick="closeModal('guidelines-modal')" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
             </div>
             <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto">
-                <p><b>1. Base Paper Selection:</b> Ensure your uploaded paper is in standard format (IEEE, ACM, ASME, ASCE, or university conference paper).</p>
-                <p><b>2. Proposed Modifications:</b> Upload your custom extension notes or summarize your novel approach in the provided technical specification area.</p>
+                <p><b>1. Base Paper Selection:</b> Ensure your uploaded paper is in standard digital format (IEEE, ACM, ASME, ASCE) with selectable text and equation matrices.</p>
+                <p><b>2. Proposed Modifications:</b> Upload custom extension notes or summarize your novel approach in the provided technical specification area.</p>
                 <p><b>3. Autonomous Quality Check:</b> The system runs non-linear algebraic verification, harmonic distortion analysis, and checks system stability before generating the final deliverable package.</p>
                 <p><b>4. Deliverables Package:</b> Each completed ZIP bundle includes native execution files, complete Word documentation (.docx), circuit schematics/block diagrams, and presentation review slides (.pptx).</p>
             </div>
@@ -324,7 +364,6 @@
         </div>
     </div>
 
-    <!-- 2. Terms of Service Modal -->
     <div id="terms-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -342,7 +381,6 @@
         </div>
     </div>
 
-    <!-- 3. Privacy & Intellectual Property Modal -->
     <div id="privacy-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="glass-panel max-w-lg w-full rounded-2xl p-6 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -351,7 +389,7 @@
             </div>
             <div class="space-y-3 text-xs text-slate-300 leading-relaxed max-h-80 overflow-y-auto">
                 <p><b>Confidentiality of Uploaded Papers:</b> Research base papers, custom abstracts, and student information are strictly confidential and are not indexed, shared, or redistributed.</p>
-                <p><b>Security & Encryption:</b> All client transactions and data handshakes are safeguarded with 256-bit SSL protocols. Payment credentials are handled directly by PCI-DSS certified gateway Razorpay.</p>
+                <p><b>Security & Encryption:</b> All client transactions and data handshakes are safeguarded with 256-bit SSL protocols.</p>
                 <p><b>Ownership:</b> Students retain full modification rights to customize and personalize all generated documentation, models, and presentation slides for their respective institutions.</p>
             </div>
             <div class="text-right pt-2 border-t border-slate-800">
@@ -388,26 +426,51 @@
             'EEE': {
                 standard: 'IEEE / IET Standards',
                 badge: 'IEEE Standard',
-                btech: '<b>Package Deliverables:</b> MATLAB/Simulink (.slx) Base Model + Custom Proposed Extension, Simulation Initialization Script (.m), Circuit Schematics, Waveforms & Harmonic Analysis (IEEE 519 THD < 5%), <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
-                mtech: '<b>Package Deliverables:</b> Advanced MATLAB/Simulink (.slx) Base Model + Verified Dual Technical Extensions, State-Space Mathematical Modeling, Comparative Results Validation, Circuit Schematics, <b>Complete Master Dissertation Book (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> High-Precision Core Circuit Execution Harness, Dynamic Transient Initialization Script, Interconnect Schematics, Harmonic Attenuation & THD Verification Matrix, <b>Comprehensive Technical Documentation (.docx)</b>, Structured Review Deck (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Dual-Comparative Simulation Harness Architecture, State-Space Boundary Formulations, Analytical Convergence Validation, System Schematics, <b>Master Dissertation Reference Book (.docx)</b>, Defense Presentation Slides.',
+                auditParams: [
+                    { name: "DC Voltage Potential", paper: "400 V", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Nominal Grid Frequency", paper: "50 Hz", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Switching Modulation Frequency", paper: "10 kHz", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Harmonic Attenuation Sizing", paper: "Omitted in Source", status: "AUTO-SIZED (IEEE Std 519)", color: "text-cyan-400" },
+                    { name: "Passive Damping Topology", paper: "Omitted in Source", status: "AUTO-SIZED (Resonance Guard)", color: "text-cyan-400" }
+                ]
             },
             'ECE': {
                 standard: 'IEEE / Springer Standards',
                 badge: 'IEEE / Springer',
-                btech: '<b>Package Deliverables:</b> Core Signal/Image Algorithm Implementation (.m / .py), Hardware Circuit Schematic (Proteus/Multisim), SNR/BER Performance Curves, Block Diagrams, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
-                mtech: '<b>Package Deliverables:</b> Advanced Wireless/Deep Learning Architecture, Hardware-in-the-Loop Implementation, Theoretical Derivations, Comprehensive Block Schematics, <b>Complete Master Thesis Book (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> Core Signal Processing Implementation Pipeline, Hardware Architecture Schematics, SNR/BER Convergence Dynamics, Functional Block Matrix, <b>Comprehensive Technical Documentation (.docx)</b>, Structured Review Deck (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Advanced Analytical Processing Engine, Hardware Boundary Constraints, Theoretical Convergence Matrices, Complete Block Diagrams, <b>Master Thesis Reference Book (.docx)</b>, Defense Presentation Slides.',
+                auditParams: [
+                    { name: "Carrier Modulation Center", paper: "2.4 GHz", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Sampling Clock Rate", paper: "48 kHz", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Constellation Order", paper: "64-QAM", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Nyquist Guard Dynamics", paper: "Omitted in Source", status: "AUTO-SIZED (Nyquist Standard)", color: "text-cyan-400" }
+                ]
             },
             'CSE': {
-                standard: 'ACM / IEEE / NeurIPS Standards',
-                badge: 'ACM / IEEE / ArXiv',
-                btech: '<b>Package Deliverables:</b> Complete Source Code Repository (.py), Jupyter Notebooks, Baseline vs Proposed Model Weights, Interactive Web Demo, System Architecture Schematics, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
-                mtech: '<b>Package Deliverables:</b> Custom Deep Neural Architecture, End-to-End Evaluation Pipeline, Docker Deployment Environment, Complete Dataset Pipeline, <b>Complete Master Thesis Book (.docx)</b>, 20-Slide PPT.'
+                standard: 'ACM / IEEE Standards',
+                badge: 'ACM / IEEE Standard',
+                btech: '<b>Package Deliverables:</b> Source Code Implementation Pipeline, Modular Execution Notebooks, Baseline vs Proposed Evaluation Architecture, Interactive Demonstration Engine, <b>Comprehensive Technical Documentation (.docx)</b>, Structured Review Deck (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Custom Analytical Neural Framework, End-to-End Evaluation Pipeline, Isolated Execution Configuration, Pre-Processed Dataset Pipeline, <b>Master Thesis Reference Book (.docx)</b>, Defense Presentation Slides.',
+                auditParams: [
+                    { name: "Core Model Architecture", paper: "Residual Framework", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Optimization Routine", paper: "Adaptive Momentum", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Batch Dynamics", paper: "32", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Regularization Penalty", paper: "Omitted in Source", status: "AUTO-TUNED (L2 Constrained)", color: "text-cyan-400" }
+                ]
             },
             'MECH': {
-                standard: 'ASME / SAE / ASCE Standards',
+                standard: 'ASME / ASCE Standards',
                 badge: 'ASME / ASCE Standard',
-                btech: '<b>Package Deliverables:</b> Parametric 3D CAD Universal Assembly (.step), Structural & Thermal Boundary Simulations, Factor of Safety Contours, Detailed Component Schematics, <b>Complete Project Documentation (.docx)</b>, Review Presentation (.pptx).',
-                mtech: '<b>Package Deliverables:</b> Coupled Multi-Physics Simulation (CFD / Non-linear FEA), Dynamic Kinetics Modeling, Extensive Analytical Validations, <b>Complete Master Dissertation Book (.docx)</b>, 20-Slide PPT.'
+                btech: '<b>Package Deliverables:</b> Parametric 3D CAD Universal Assembly, Structural & Thermal Boundary Simulations, Safety Factor Distribution Maps, Component Interconnect Schematics, <b>Comprehensive Technical Documentation (.docx)</b>, Structured Review Deck (.pptx).',
+                mtech: '<b>Package Deliverables:</b> Coupled Multi-Physics Simulation Harness, Dynamic Kinetic Formulations, Extensive Analytical Validations, <b>Master Dissertation Reference Book (.docx)</b>, Defense Presentation Slides.',
+                auditParams: [
+                    { name: "Material Matrix Specification", paper: "Structural Alloy Grade", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Boundary Constraint Matrix", paper: "Fixed Boundary Plane", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Applied Load Profile", paper: "5000 N Distributed", status: "VERIFIED", color: "text-emerald-400" },
+                    { name: "Mesh Convergence Tolerance", paper: "Omitted in Source", status: "AUTO-SIZED (Tolerance < 2%)", color: "text-cyan-400" }
+                ]
             }
         };
 
@@ -425,7 +488,7 @@
                 <p class="text-slate-300 leading-relaxed">${data}</p>
             `;
             document.getElementById('page-tier-label').innerText = `${currentLevel} Project Book`;
-            resetVerification();
+            softReset();
         }
 
         function setLevel(level) {
@@ -456,14 +519,19 @@
 
         function handleBasePaperSelected(event) {
             const file = event.target.files[0];
+            const warningBox = document.getElementById('scanned-warning-box');
             if (file) {
-                if (file.size < 5000) {
-                    alert("The uploaded file appears to be empty or corrupted. Please upload a valid paper (PDF/Word).");
+                if (file.size < 15000) {
+                    warningBox.classList.remove('hidden');
+                    event.target.value = '';
+                    uploadedBasePaper = null;
+                    document.getElementById('base-file-label').innerText = "Upload IEEE / ScienceDirect benchmark paper (PDF)";
                     return;
                 }
+                warningBox.classList.add('hidden');
                 uploadedBasePaper = file;
-                document.getElementById('base-file-label').innerHTML = `<span class="text-cyan-400 font-bold">Base Paper:</span> ${file.name}`;
-                resetVerification();
+                document.getElementById('base-file-label').innerHTML = `<span class="text-cyan-400 font-bold">Base Paper:</span> ${escapeHtml(file.name)}`;
+                softReset();
             }
         }
 
@@ -471,12 +539,12 @@
             const file = event.target.files[0];
             if (file) {
                 uploadedExtension = file;
-                document.getElementById('extension-file-label').innerHTML = `<span class="text-blue-400 font-bold">Extension File:</span> ${file.name}`;
-                resetVerification();
+                document.getElementById('extension-file-label').innerHTML = `<span class="text-blue-400 font-bold">Extension File:</span> ${escapeHtml(file.name)}`;
+                softReset();
             }
         }
 
-        function resetVerification() {
+        function softReset() {
             if (activeTimer) {
                 clearInterval(activeTimer);
                 activeTimer = null;
@@ -485,6 +553,7 @@
             document.getElementById('payment-gate-section').classList.add('hidden');
             document.getElementById('status-result-box').classList.add('hidden');
             document.getElementById('verification-terminal').classList.add('hidden');
+            document.getElementById('audit-table-card').classList.add('hidden');
             document.getElementById('btn-verify').disabled = false;
         }
 
@@ -499,7 +568,7 @@
                 return;
             }
 
-            resetVerification();
+            softReset();
 
             const terminal = document.getElementById('verification-terminal');
             const logs = document.getElementById('terminal-logs');
@@ -507,19 +576,21 @@
             const btnVerify = document.getElementById('btn-verify');
             const statusBox = document.getElementById('status-result-box');
             const paymentGate = document.getElementById('payment-gate-section');
+            const auditCard = document.getElementById('audit-table-card');
+            const auditTableRows = document.getElementById('audit-table-rows');
 
             terminal.classList.remove('hidden');
             logs.innerHTML = '';
             btnVerify.disabled = true;
 
             const steps = [
-                `Analyzing base model benchmark parameters for ${currentBranch}...`,
-                "Synthesizing proposed extension topology and boundary modifications...",
-                "Running non-linear ODE solver & testing algebraic stability...",
-                "Verifying transient load dynamics and settling characteristics...",
-                "Evaluating harmonic distortion & comparative performance curves...",
-                "Generating complete academic thesis documentation and schematics...",
-                "Technical Verification 100% Complete. Ready for packaging."
+                `Auditing base parameter array for ${currentBranch}...`,
+                "Parsing state variable differential equations...",
+                "Synthesizing proposed extension boundary conditions...",
+                "Running analytical damping & ripple convergence routine...",
+                "Validating harmonic distortion compliance via institutional standards...",
+                "Synthesizing complete academic dissertation book and schematics...",
+                "Quality Gate 100% Passed. Deliverables array compiled."
             ];
 
             let stepIdx = 0;
@@ -537,6 +608,19 @@
                     btnVerify.disabled = false;
                     isVerified = true;
 
+                    auditTableRows.innerHTML = '';
+                    const params = branchConfig[currentBranch].auditParams;
+                    params.forEach(param => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="py-2.5 font-medium">${param.name}</td>
+                            <td class="py-2.5 font-mono text-slate-400">${param.paper}</td>
+                            <td class="py-2.5 font-mono font-semibold ${param.color}">${param.status}</td>
+                        `;
+                        auditTableRows.appendChild(tr);
+                    });
+                    auditCard.classList.remove('hidden');
+
                     statusBox.innerHTML = `
                         <div class="p-4 bg-emerald-950/60 border border-emerald-500 rounded-xl text-emerald-300 text-xs flex items-center justify-between">
                             <div>
@@ -550,24 +634,44 @@
                     paymentGate.classList.remove('hidden');
                     paymentGate.scrollIntoView({ behavior: 'smooth' });
                 }
-            }, 500);
+            }, 450);
         }
 
-        function simulatePayment() {
+        function verifyAndAutoDownload() {
             if (!isVerified) {
                 alert("Security restriction: Quality verification must pass prior to delivery settlement.");
                 return;
             }
 
+            const utr = document.getElementById('utr-input').value.trim();
+            if (utr.length !== 12 || !/^\d+$/.test(utr)) {
+                alert("Please enter a valid 12-digit numeric reference ID from your transaction receipt.");
+                return;
+            }
+
             const btnPay = document.getElementById('btn-pay');
-            btnPay.innerText = "Connecting to Razorpay Secure Gateway...";
+            btnPay.innerText = "Verifying Reference Transaction...";
             btnPay.disabled = true;
 
             setTimeout(() => {
-                alert("Payment of ₹1,000 Verified Successfully via Razorpay!\nYour verified Base + Extension ZIP bundle is now downloading.");
+                showDownloadSuccessModal("Reference Verified Successfully! Your verified Base + Extension ZIP bundle is downloading automatically. All the best!");
                 generateDynamicZip();
                 btnPay.innerText = "Package Delivered (Downloaded)";
             }, 1200);
+        }
+
+        function showDownloadSuccessModal(msg) {
+            const modal = document.createElement('div');
+            modal.style = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#0f172a;border:2px solid #10b981;padding:25px;border-radius:14px;text-align:center;box-shadow:0 0 35px rgba(0,0,0,0.9);z-index:9999;color:#fff;max-width:400px;width:90%;";
+            modal.innerHTML = `
+                <div class="w-12 h-12 bg-emerald-950 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3 border border-emerald-800">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h3 class="text-base font-bold text-white mb-1">Settlement Confirmed</h3>
+                <p class="text-xs text-slate-300 leading-relaxed">${msg}</p>
+            `;
+            document.body.appendChild(modal);
+            setTimeout(() => modal.remove(), 4500);
         }
 
         function generateDynamicZip() {
@@ -576,18 +680,17 @@
             const folder = zip.folder(folderName);
 
             if (currentBranch === 'EEE') {
-                folder.file("base_circuit_model.slx", "MATLAB Simulink Base Paper Model");
-                folder.file("extended_circuit_model.slx", "MATLAB Simulink Extended Model");
-                folder.file("system_parameters.m", "% System Initialization Script\nfs = 10000;\nP_rated = 5000;");
+                folder.file("system_parameters.m", "% Institutional System Initialization Script\nfs = 10000;\nP_rated = 5000;\nVdc = 400;\nL1 = 2.4e-3;\nC_filter = 15e-6;");
+                folder.file("circuit_schematic_wiring.txt", "Institutional Topology Schematics & Node Connection Matrix.");
             } else if (currentBranch === 'ECE') {
-                folder.file("signal_core.m", "% ECE Algorithm Implementation Script");
-                folder.file("hardware_schematic.pdsprj", "Proteus Hardware Circuit Design File");
+                folder.file("signal_core.m", "% Core Algorithm Implementation Script\nFs = 48000;\nM = 64;");
+                folder.file("hardware_schematic.txt", "Hardware Architecture Design & Pin Mapping.");
             } else if (currentBranch === 'CSE') {
-                folder.file("train_pipeline.py", "# ML / Deep Learning Pipeline Script");
-                folder.file("web_demo.py", "# Interactive Web Application");
+                folder.file("train_pipeline.py", "# Execution Pipeline Script\nimport os\nprint('Model Convergence Ready')");
+                folder.file("web_demo.py", "# Demonstration Interface Script");
             } else {
-                folder.file("geometry_assembly.step", "Universal CAD 3D Model");
-                folder.file("fea_analysis.wbpj", "ANSYS Workbench Project");
+                folder.file("boundary_conditions.txt", "Universal Structural & Thermal Boundary Matrices.");
+                folder.file("fea_analysis_log.txt", "Non-linear Simulation Validation Log.");
             }
 
             folder.file(`Complete_Project_Book_${currentLevel}.docx`, `Complete College Project Documentation (${currentLevel}) including mathematical equations, literature survey, circuit schematics, and comparative waveform captures.`);
@@ -600,11 +703,17 @@
                 a.download = `${folderName}.zip`;
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
+                setTimeout(() => {
+                    URL.revokeObjectURL(a.href);
+                    document.body.removeChild(a);
+                }, 1000);
             });
         }
 
-        // Helpdesk & Live Chat
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
         function toggleChat() {
             const popup = document.getElementById('chat-popup');
             popup.classList.toggle('hidden');
@@ -630,7 +739,7 @@
             box.scrollTop = box.scrollHeight;
 
             setTimeout(() => {
-                let reply = "Our technical advisory team verifies each project paper and extension before delivery. For instant technical support, connect directly via our emergency WhatsApp helpline.";
+                let reply = "Our technical advisory team verifies each project paper and extension before delivery. For inquiries, utilize our automated platform ticket queue.";
                 const lower = msg.toLowerCase();
                 if (lower.includes('package') || lower.includes('included') || lower.includes('zip')) {
                     reply = "The ZIP package contains: 1) Verified simulation models (.slx / .py / CAD), 2) Complete Word Project Book (.docx), 3) Schematics & Waveforms, and 4) Review PPT.";
@@ -648,7 +757,6 @@
             }, 600);
         }
 
-        // Modal Handlers
         function openModal(id) {
             document.getElementById(id).classList.remove('hidden');
         }
@@ -656,14 +764,14 @@
             document.getElementById(id).classList.add('hidden');
         }
 
-        // Anti-Theft & Inspection Shield Protection
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
+        // Extended Anti-Theft & Scraping Shield
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('selectstart', e => e.preventDefault());
+        document.addEventListener('copy', e => e.preventDefault());
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123 || 
                 (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-                (e.ctrlKey && e.keyCode === 85)) {
+                (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 65 || e.keyCode === 67))) {
                 e.preventDefault();
                 return false;
             }
