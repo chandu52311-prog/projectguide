@@ -236,7 +236,7 @@
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
                     <span>MATLAB Auto-Runner Script</span>
-                    <span class="text-emerald-400 font-semibold">run_comparative_simulation.m</span>
+                    <span class="text-emerald-400 font-semibold">run_simulation_workbench.m</span>
                 </div>
                 <div class="flex justify-between pt-2 text-sm font-bold text-white">
                     <span>Delivery Settlement Fee</span>
@@ -419,6 +419,10 @@
             }
         };
 
+        function esc(s) { 
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); 
+        }
+
         function updateDeliverablesView() {
             const preview = document.getElementById('deliverables-preview');
             const conf = branchConfig[currentBranch];
@@ -464,7 +468,7 @@
             const file = event.target.files[0];
             if (file) {
                 uploadedBasePaper = file;
-                document.getElementById('base-file-label').innerHTML = `<span class="text-cyan-400 font-bold">Base Paper:</span> ${escapeHtml(file.name)}`;
+                document.getElementById('base-file-label').innerHTML = `<span class="text-cyan-400 font-bold">Base Paper:</span> ${esc(file.name)}`;
                 softReset();
             }
         }
@@ -473,7 +477,7 @@
             const file = event.target.files[0];
             if (file) {
                 uploadedExtension = file;
-                document.getElementById('extension-file-label').innerHTML = `<span class="text-blue-400 font-bold">Extension File:</span> ${escapeHtml(file.name)}`;
+                document.getElementById('extension-file-label').innerHTML = `<span class="text-blue-400 font-bold">Extension File:</span> ${esc(file.name)}`;
                 softReset();
             }
         }
@@ -487,14 +491,13 @@
             document.getElementById('btn-verify').disabled = false;
         }
 
-        // Real Backend Pipeline Execution
+        // Updated Quality Gate from frontend_api_patch_2.js
         async function startQualityGate() {
             const customNotes = document.getElementById('custom-notes').value.trim();
-            if (!uploadedBasePaper) {
-                alert("Please upload your Primary Base Paper (PDF) to proceed.");
-                return;
+            if (!uploadedBasePaper) { 
+                alert("Please upload your Primary Base Paper (PDF) to proceed."); 
+                return; 
             }
-
             softReset();
 
             const terminal = document.getElementById('verification-terminal');
@@ -504,182 +507,126 @@
             const statusBox = document.getElementById('status-result-box');
             const paymentGate = document.getElementById('payment-gate-section');
             const auditCard = document.getElementById('audit-table-card');
-            const auditTableRows = document.getElementById('audit-table-rows');
+            const rows = document.getElementById('audit-table-rows');
 
             terminal.classList.remove('hidden');
             logs.innerHTML = '';
             btnVerify.disabled = true;
-
-            const appendLog = (msg) => {
-                const p = document.createElement('div');
-                p.innerHTML = `<span class="text-cyan-400">➜</span> ${msg}`;
-                logs.appendChild(p);
-                logs.scrollTop = logs.scrollHeight;
+            const log = (msg) => { 
+                const d = document.createElement('div'); 
+                d.innerHTML = `<span class="text-cyan-400">➜</span> ${msg}`; 
+                logs.appendChild(d); 
+                logs.scrollTop = logs.scrollHeight; 
             };
 
-            appendLog(`Uploading Base Paper (${uploadedBasePaper.name}) to FastAPI backend...`);
-            percent.innerText = "20%";
-
             try {
-                const formData = new FormData();
-                formData.append("paper", uploadedBasePaper);
-                if (uploadedExtension) {
-                    formData.append("abstract", uploadedExtension);
-                    appendLog(`Attaching Proposed Abstract (${uploadedExtension.name})...`);
+                percent.innerText = "20%";
+                log(`Uploading ${esc(uploadedBasePaper.name)}...`);
+                const fd = new FormData();
+                fd.append("paper", uploadedBasePaper);
+                if (uploadedExtension) fd.append("abstract", uploadedExtension);
+                fd.append("notes", customNotes);
+
+                const res = await fetch(`${BACKEND_URL}/api/audit-paper`, { method: "POST", body: fd });
+                if (!res.ok) {
+                    let detail = res.statusText;
+                    try { detail = (await res.json()).detail || detail; } catch (_) {}
+                    throw new Error(detail);
                 }
-                formData.append("notes", customNotes);
-
-                percent.innerText = "50%";
-                appendLog("Backend parsing PDF text & extracting electrical matrices via PyMuPDF...");
-
-                const response = await fetch(`${BACKEND_URL}/api/audit-paper`, {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Server returned error: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                latestAuditedData = result;
-
-                percent.innerText = "85%";
-                appendLog(`Abstract identified novelty: [${result.novelty_type}]`);
-                appendLog(`Required Simulink harnesses selected: ${result.required_models.join(', ')}`);
-                appendLog("IEEE Std 519 LCL/LLCL attenuation and resonance guard calculated.");
+                const r = await res.json();
+                latestAuditedData = r;
                 percent.innerText = "100%";
+
+                const lcl = r.lcl_sizing, v = lcl.verification, p = r.provenance;
+                const tag = (k) => p[k] === "extracted"
+                    ? '<span class="text-emerald-400 font-semibold">EXTRACTED FROM PAPER</span>'
+                    : '<span class="text-amber-400 font-semibold">DEFAULT – NOT FOUND, PLEASE CHECK</span>';
+                log(`Novelty: ${esc(r.novelty_type)} (${esc(r.novelty_source)}${r.novelty_keywords.length ? ': ' + esc(r.novelty_keywords.join(', ')) : ''})`);
+                log(`Ripple gain at fsw vs L1-only: ${v.ripple_gain_vs_L1_only.toFixed(3)} (target ≤ ${lcl.att_ratio_target})`);
+
+                const R = r.ratings;
+                rows.innerHTML = `
+                  <tr><td class="py-2">DC Bus (Vdc)</td><td class="py-2 text-cyan-300 font-bold">${R.v_dc} V</td><td class="py-2">${tag('v_dc')}</td></tr>
+                  <tr><td class="py-2">Grid Voltage</td><td class="py-2 text-cyan-300 font-bold">${R.v_grid} V @ ${R.f_grid} Hz</td><td class="py-2">${tag('v_grid')}</td></tr>
+                  <tr><td class="py-2">Switching Frequency</td><td class="py-2 text-cyan-300 font-bold">${(R.f_sw / 1000).toFixed(1)} kHz</td><td class="py-2">${tag('f_sw')}</td></tr>
+                  <tr><td class="py-2">Rated Power</td><td class="py-2 text-cyan-300 font-bold">${(R.p_rated / 1000).toFixed(2)} kW</td><td class="py-2">${tag('p_rated')}</td></tr>
+                  <tr><td class="py-2">L1</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.L1_inverter_H * 1e3).toFixed(3)} mH</td></tr>
+                  <tr><td class="py-2">L2</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.L2_grid_H * 1e3).toFixed(3)} mH</td></tr>
+                  <tr><td class="py-2">Cf</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.C_filter_F * 1e6).toFixed(2)} µF</td></tr>
+                  <tr><td class="py-2">Resonance</td><td class="py-2 text-slate-400">${lcl.f_resonance_Hz.toFixed(0)} Hz</td><td class="py-2 font-semibold ${lcl.status === 'VERIFIED' ? 'text-emerald-400' : 'text-amber-400'}">${lcl.status}</td></tr>`;
+                auditCard.classList.remove('hidden');
+
+                document.getElementById('novelty-manifest-label').innerText = `${r.novelty_type} model (generated in MATLAB)`;
+                document.getElementById('novelty-manifest-val').innerText = "Built by build_proposed_model.m";
+
+                const ok = lcl.status === 'VERIFIED';
+                const warns = (lcl.warnings || []).map(esc).join('<br>');
+                statusBox.innerHTML = `<div class="p-4 ${ok ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-amber-950/60 border-amber-500 text-amber-300'} border rounded-xl text-xs">
+                    <span class="font-bold text-sm block">${ok ? '✔ Analytical filter check passed' : '⚠ Filter check has warnings'}</span>
+                    Frequency-domain check only; Simulink models are built and simulated on your MATLAB.${warns ? '<br>' + warns : ''}</div>`;
+                statusBox.classList.remove('hidden');
 
                 isVerified = true;
                 btnVerify.disabled = false;
-
-                // Render real dynamic extracted parameters into table
-                const r = result.ratings;
-                const lcl = result.lcl_sizing;
-                auditTableRows.innerHTML = `
-                    <tr>
-                        <td class="py-2">DC Bus Potential (V_dc)</td>
-                        <td class="py-2 text-cyan-300 font-bold">${r.v_dc} V</td>
-                        <td class="py-2 text-emerald-400 font-semibold">VERIFIED FROM SOURCE</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Grid Voltage & Frequency</td>
-                        <td class="py-2 text-cyan-300 font-bold">${r.v_grid} V @ 50 Hz</td>
-                        <td class="py-2 text-emerald-400 font-semibold">VERIFIED FROM SOURCE</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Switching Frequency (f_sw)</td>
-                        <td class="py-2 text-cyan-300 font-bold">${(r.f_sw / 1000).toFixed(1)} kHz</td>
-                        <td class="py-2 text-emerald-400 font-semibold">VERIFIED FROM SOURCE</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Inverter Filter Inductance (L1)</td>
-                        <td class="py-2 text-slate-400">Omitted in Source</td>
-                        <td class="py-2 text-cyan-400 font-semibold">AUTO-SIZED (${(lcl.L1_inverter_H * 1000).toFixed(2)} mH)</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Grid Filter Inductance (L2)</td>
-                        <td class="py-2 text-slate-400">Omitted in Source</td>
-                        <td class="py-2 text-cyan-400 font-semibold">AUTO-SIZED (${(lcl.L2_grid_H * 1000).toFixed(2)} mH)</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Filter Capacitor (Cf)</td>
-                        <td class="py-2 text-slate-400">Omitted in Source</td>
-                        <td class="py-2 text-cyan-400 font-semibold">AUTO-SIZED (${(lcl.C_filter_F * 1e6).toFixed(2)} µF)</td>
-                    </tr>
-                    <tr>
-                        <td class="py-2">Resonance Stability Guard</td>
-                        <td class="py-2 text-slate-400">Calculated: ${lcl.f_resonance_Hz} Hz</td>
-                        <td class="py-2 text-emerald-400 font-semibold">${lcl.status}</td>
-                    </tr>
-                `;
-                auditCard.classList.remove('hidden');
-
-                // Dynamic update in the manifest
-                document.getElementById('novelty-manifest-label').innerText = `${result.novelty_type} (.slx)`;
-                document.getElementById('novelty-manifest-val').innerText = `${result.required_models.length} Models Linked`;
-
-                statusBox.innerHTML = `
-                    <div class="p-4 bg-emerald-950/60 border border-emerald-500 rounded-xl text-emerald-300 text-xs flex items-center justify-between">
-                        <div>
-                            <span class="font-bold text-sm block text-emerald-200">✔ Technical Verification 100% Passed</span>
-                            Source Paper extracted • Abstract [${result.novelty_type}] synchronized with Simulink Harness
-                        </div>
-                        <span class="font-mono text-xs bg-emerald-900 px-2 py-1 rounded text-emerald-300">PASS_VERIFIED</span>
-                    </div>
-                `;
-                statusBox.classList.remove('hidden');
                 paymentGate.classList.remove('hidden');
                 paymentGate.scrollIntoView({ behavior: 'smooth' });
-
             } catch (err) {
                 console.error(err);
-                appendLog(`<span class="text-red-400">Error: Could not connect to backend at ${BACKEND_URL}. Ensure uvicorn server is running!</span>`);
+                log(`<span class="text-red-400">Error: ${esc(err.message)} (backend: ${BACKEND_URL}; is uvicorn running?)</span>`);
                 btnVerify.disabled = false;
             }
         }
 
-        // Direct Real ZIP Download from FastAPI Endpoint
+        // Updated Real ZIP Streaming from frontend_api_patch_2.js
         async function triggerBackendZipDownload() {
-            if (!isVerified) {
-                alert("Security restriction: Verification must complete first.");
-                return;
+            if (!isVerified || !latestAuditedData) { 
+                alert("Run the validation first."); 
+                return; 
             }
-
             const utr = document.getElementById('utr-input').value.trim();
-            if (utr.length < 6) {
-                alert("Please enter a valid Reference / UTR Number first.");
-                return;
+            if (!/^\d{12}$/.test(utr)) { 
+                alert("Enter a valid 12-digit UTR."); 
+                return; 
             }
 
-            const btnPay = document.getElementById('btn-pay');
-            const originalText = btnPay.innerHTML;
-            btnPay.innerHTML = "⏳ Streaming Real Simulink & MATLAB Package...";
-            btnPay.disabled = true;
-
+            const btn = document.getElementById('btn-pay');
+            const original = btn.innerHTML;
+            btn.innerHTML = "⏳ Building package...";
+            btn.disabled = true;
             try {
-                const formData = new FormData();
-                formData.append("branch", currentBranch);
-                formData.append("level", currentLevel);
-                if (latestAuditedData && latestAuditedData.ratings) {
-                    formData.append("v_dc", latestAuditedData.ratings.v_dc);
-                    formData.append("v_grid", latestAuditedData.ratings.v_grid);
-                    formData.append("p_rated", latestAuditedData.ratings.p_rated);
-                    formData.append("f_sw", latestAuditedData.ratings.f_sw);
+                const R = latestAuditedData.ratings;
+                const fd = new FormData();
+                fd.append("branch", currentBranch);
+                fd.append("level", currentLevel);
+                for (const k of ["v_dc", "v_grid", "f_grid", "p_rated", "f_sw"]) fd.append(k, R[k]);
+                fd.append("novelty_type", latestAuditedData.novelty_type);
+                fd.append("provenance", JSON.stringify(latestAuditedData.provenance));
+                fd.append("custom_notes", document.getElementById('custom-notes').value.trim());
+                fd.append("utr", utr);
+
+                const res = await fetch(`${BACKEND_URL}/api/generate-kit`, { method: "POST", body: fd });
+                if (!res.ok) {
+                    let detail = res.statusText;
+                    try { detail = (await res.json()).detail || detail; } catch (_) {}
+                    throw new Error(detail);
                 }
-                formData.append("custom_notes", document.getElementById('custom-notes').value.trim());
-
-                const response = await fetch(`${BACKEND_URL}/api/generate-kit`, {
-                    method: "POST",
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error("Backend ZIP generation failed: " + response.statusText);
-                }
-
-                const blob = await response.blob();
-                const downloadUrl = window.URL.createObjectURL(blob);
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
-                a.href = downloadUrl;
-                a.download = `ProjectGuide_${currentBranch}_${currentLevel}_Verified_Simulink_Kit.zip`;
-                document.body.appendChild(a);
-                a.click();
+                a.href = url;
+                a.download = `ProjectGuide_${currentBranch}_${currentLevel.replace('.', '')}_Kit.zip`;
+                document.body.appendChild(a); 
+                a.click(); 
                 a.remove();
-                window.URL.revokeObjectURL(downloadUrl);
-
-                btnPay.innerHTML = "✔ Download Complete!";
-                alert("Verified Autonomous Package Downloaded! Extract and run 'run_simulation_workbench.m' in MATLAB to programmatically synthesize and simulate your models.");
+                URL.revokeObjectURL(url);
+                btn.innerHTML = "✔ Download Complete";
+                alert("Extract the zip and run 'run_simulation_workbench' in MATLAB.");
             } catch (err) {
                 console.error(err);
-                alert("Download failed. Make sure your Python Uvicorn server is running.");
-                btnPay.innerHTML = originalText;
-                btnPay.disabled = false;
+                alert("Download failed: " + err.message);
+                btn.innerHTML = original;
+                btn.disabled = false;
             }
-        }
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         function toggleChat() {
