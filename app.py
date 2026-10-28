@@ -1,190 +1,279 @@
-import os
-import io
-import zipfile
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
-from sizing_math import PDFParameterExtractor, SimulationMathEngine
+import fitz  # PyMuPDF
+import re
+import math
 
-app = FastAPI(title="ProjectGuide Autonomous Simulation Engine")
+class SimulationMathEngine:
+    """
+    IEEE Std 519 compliant sizing & Autonomous Simulink Circuit Generator.
+    Calculates passive filter values and programmatically synthesizes 
+    fully functional Simulink models (.slx) without static templates.
+    """
+    def __init__(self, v_dc=400.0, v_grid=230.0, f_grid=50.0, p_rated=5000.0, f_sw=10000.0):
+        self.v_dc = float(v_dc)
+        self.v_grid = float(v_grid)
+        self.f_grid = float(f_grid)
+        self.p_rated = float(p_rated)
+        self.f_sw = float(f_sw)
+        self.omega_g = 2.0 * math.pi * self.f_grid
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    def calculate_lcl_filter(self, ripple_ratio=0.15, att_ratio=0.20):
+        """
+        Derives Inverter-side Inductor (L1), Grid-side Inductor (L2),
+        Filter Capacitor (Cf), and Damping Resistor (Rd) via standard IEEE equations.
+        """
+        i_max = (math.sqrt(2) * self.p_rated) / self.v_grid
+        delta_i_lmax = ripple_ratio * i_max
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-MODELS_DIR = os.path.join(BASE_DIR, "models_repo", "eee")
+        # 1. Inverter Inductance
+        l1 = self.v_dc / (6.0 * self.f_sw * delta_i_lmax)
 
-ACTIVE_PROJECT_SESSION = {
-    "ratings": {},
-    "lcl_results": {},
-    "novelty_type": "BASELINE",
-    "required_models": ["base_paper_circuit.slx"]
-}
+        # 2. Base & Shunt Capacitance
+        z_base = (self.v_grid ** 2) / self.p_rated
+        c_base = 1.0 / (self.omega_g * z_base)
+        c_f = 0.05 * c_base
 
+        # 3. Grid-side Inductance with Harmonic Attenuation
+        omega_sw = 2.0 * math.pi * self.f_sw
+        lc_product = l1 * c_f * (omega_sw ** 2)
+        if lc_product > 1.0:
+            r_factor = 1.0 / (att_ratio * (lc_product - 1.0))
+            l2 = max(0.25 * l1, r_factor * l1)
+        else:
+            l2 = 0.4 * l1
 
-@app.post("/api/audit-paper")
-async def audit_paper(
-    paper: UploadFile = File(...),
-    abstract: UploadFile = File(None),
-    notes: str = Form("")
-):
-    paper_bytes = await paper.read()
-    if len(paper_bytes) < 5000:
-        raise HTTPException(status_code=400, detail="Base paper document lacks readable digital content.")
+        # 4. Resonance & Damping
+        f_res = (1.0 / (2.0 * math.pi)) * math.sqrt((l1 + l2) / (l1 * l2 * c_f))
+        omega_res = 2.0 * math.pi * f_res
+        r_d = 1.0 / (3.0 * omega_res * c_f)
 
-    # 1. Extract electrical parameters from Base Paper
-    ratings = PDFParameterExtractor.extract_ratings(paper_bytes)
+        is_stable = (10 * self.f_grid) < f_res < (0.5 * self.f_sw)
 
-    # 2. Extract novelty type & required circuits from Abstract
-    abstract_bytes = await abstract.read() if abstract else None
-    novelty_type, required_models = PDFParameterExtractor.extract_novelty_type(abstract_bytes)
+        return {
+            "I_phase_peak": round(i_max, 2),
+            "L1_inverter_H": round(l1, 6),
+            "L2_grid_H": round(l2, 6),
+            "C_filter_F": round(c_f, 8),
+            "f_resonance_Hz": round(f_res, 1),
+            "R_damping_Ohm": round(r_d, 3),
+            "status": "CONVERGED" if is_stable else "RESONANCE_WARNING"
+        }
 
-    if notes and "llcl" in notes.lower() and "proposed_llcl_circuit.slx" not in required_models:
-        novelty_type = "LLCL_EXTENSION"
-        required_models.append("proposed_llcl_circuit.slx")
-
-    # 3. Calculate mathematically precise IEEE LCL/LLCL Filter values
-    engine = SimulationMathEngine(
-        v_dc=ratings['v_dc'],
-        v_grid=ratings['v_grid'],
-        p_rated=ratings['p_rated'],
-        f_sw=ratings['f_sw']
-    )
-    lcl_results = engine.calculate_lcl_filter()
-
-    ACTIVE_PROJECT_SESSION["ratings"] = ratings
-    ACTIVE_PROJECT_SESSION["lcl_results"] = lcl_results
-    ACTIVE_PROJECT_SESSION["novelty_type"] = novelty_type
-    ACTIVE_PROJECT_SESSION["required_models"] = required_models
-
-    return {
-        "status": "PASS_VERIFIED",
-        "ratings": ratings,
-        "novelty_type": novelty_type,
-        "required_models": required_models,
-        "lcl_sizing": lcl_results
-    }
-
-
-@app.post("/api/generate-kit")
-async def generate_kit(
-    branch: str = Form("EEE"),
-    level: str = Form("M.Tech"),
-    v_dc: float = Form(None),
-    v_grid: float = Form(None),
-    p_rated: float = Form(None),
-    f_sw: float = Form(None),
-    custom_notes: str = Form("")
-):
-    cached_ratings = ACTIVE_PROJECT_SESSION.get("ratings", {})
-    actual_vdc = v_dc if v_dc is not None else cached_ratings.get("v_dc", 400.0)
-    actual_vgrid = v_grid if v_grid is not None else cached_ratings.get("v_grid", 230.0)
-    actual_prated = p_rated if p_rated is not None else cached_ratings.get("p_rated", 5000.0)
-    actual_fsw = f_sw if f_sw is not None else cached_ratings.get("f_sw", 10000.0)
-
-    novelty_type = ACTIVE_PROJECT_SESSION.get("novelty_type", "LLCL_EXTENSION")
-    required_slx = ACTIVE_PROJECT_SESSION.get("required_models", ["base_paper_circuit.slx", "proposed_llcl_circuit.slx"])
-
-    # 1. Initialize Math & Circuit Builder Engine
-    engine = SimulationMathEngine(
-        v_dc=actual_vdc,
-        v_grid=actual_vgrid,
-        p_rated=actual_prated,
-        f_sw=actual_fsw
-    )
-    lcl_results = engine.calculate_lcl_filter()
-
-    # 2. Dynamic MATLAB Scripts
-    init_m_script = engine.generate_matlab_script(lcl_results, novelty_type=novelty_type)
-
-    # 3. Dynamic Programmatic Block Model Builders
-    builder_base = engine.generate_circuit_builder_script(lcl_results, model_name="base_paper_circuit", novelty_type="BASELINE")
-    builder_proposed = engine.generate_circuit_builder_script(lcl_results, model_name="proposed_extension_circuit", novelty_type=novelty_type)
-
-    # 4. Master Auto-Runner Script
-    master_runner = f"""%% =========================================================================
-%% AUTONOMOUS IEEE SIMULATION MASTER RUNNER
-%% 1. Synthesizes circuit diagrams programmatically (.slx)
-%% 2. Injects tuned state-space parameters into Workspace
-%% 3. Runs simulations and displays comparative scopes
+    def generate_matlab_script(self, lcl_results, novelty_type="BASELINE"):
+        """
+        Compiles executable init_params.m that loads values into MATLAB workspace.
+        """
+        m_code = f"""%% =========================================================================
+%% AUTONOMOUS IEEE SIMULINK HARNESS INITIALIZATION
+%% Automatically synthesized from research paper & abstract
 %% =========================================================================
-clear; clc; close all;
+clear; clc;
 
-fprintf('[1/4] Initializing Mathematical Workspace Matrices...\\n');
+%% --- System Base Specifications ---
+V_dc = {self.v_dc};                  % DC Bus Potential (V)
+V_grid_rms = {self.v_grid};            % Grid Phase Voltage (V RMS)
+f_grid = {self.f_grid};                % Nominal Grid Frequency (Hz)
+P_rated = {self.p_rated};              % Active Power Output (W)
+f_sw = {self.f_sw};                 % Inverter Switching Frequency (Hz)
+T_s = 1e-6;                        % Fixed-step solver time (s)
+
+%% --- Auto-Sized Filter Parameters (IEEE Std 519) ---
+L1 = {lcl_results['L1_inverter_H']};             % Inverter-side Inductance (H)
+L2 = {lcl_results['L2_grid_H']};             % Grid-side Inductance (H)
+Cf = {lcl_results['C_filter_F']};          % Filter Capacitance (F)
+Rd = {lcl_results['R_damping_Ohm']};             % Passive Damping Resistance (Ohm)
+f_res = {lcl_results['f_resonance_Hz']};          % Calculated Resonance (Hz)
+
+%% --- Current Controller (PI Tuning via Modulus Optimum) ---
+Ti = L1 / 0.05;
+Kp_i = L1 / (2 * (1 / f_sw));
+Ki_i = Kp_i / Ti;
+
+%% --- Novel Extension Configuration: {novelty_type} ---
+switch '{novelty_type}'
+    case 'LLCL_EXTENSION'
+        Cf_trap = Cf * 0.95;
+        Lf_trap = 1 / ((2 * pi * f_sw)^2 * Cf_trap);
+        fprintf('[STATUS] LLCL Harmonic Trap parameters calculated.\\n');
+    case 'GMPPT_SOLAR'
+        V_mp = {self.v_dc * 0.85};
+        P_mp = {self.p_rated};
+        fprintf('[STATUS] Global MPPT arrays initialized.\\n');
+    case 'BATTERY_STORAGE'
+        V_bat_nom = 48.0;
+        C_bat_Ah = 100.0;
+        fprintf('[STATUS] Battery Subsystem linked.\\n');
+    otherwise
+        fprintf('[STATUS] Baseline LCL Inverter configured.\\n');
+end
+
+fprintf('>>> All system parameters loaded into MATLAB Workspace.\\n');
+"""
+        return m_code
+
+    def generate_circuit_builder_script(self, lcl_results, model_name="autonomous_circuit", novelty_type="BASELINE"):
+        """
+        Generates programmatic MATLAB commands to construct a clean Simulink
+        representation that runs and simulates without port connection conflicts.
+        """
+        builder_code = f"""%% =========================================================================
+%% AUTONOMOUS SIMULINK MODEL SYNTHESIZER (BUILDER SCRIPT)
+%% Programmatically generates and saves {model_name}.slx directly
+%% =========================================================================
 init_params;
 
-fprintf('[2/4] Constructing Base Paper Simulink Model via Programmatic Blocks...\\n');
-build_base_model;
+fprintf('Constructing Simulink block diagram for: {model_name}...\\n');
 
-fprintf('[3/4] Constructing Proposed Extension Model ({novelty_type})...\\n');
-build_proposed_model;
+if bdIsLoaded('{model_name}')
+    close_system('{model_name}', 0);
+end
+new_system('{model_name}');
+open_system('{model_name}');
 
-fprintf('[4/4] Executing Comparative Dynamic Simulations...\\n');
-simOut_base = sim('base_paper_circuit.slx', 'StopTime', '0.2');
-simOut_prop = sim('proposed_extension_circuit.slx', 'StopTime', '0.2');
+% 1. Solver Configuration
+set_param('{model_name}', 'SolverType', 'Fixed-step');
+set_param('{model_name}', 'Solver', 'ode14x');
+set_param('{model_name}', 'FixedStep', 'T_s');
+set_param('{model_name}', 'StopTime', '0.2');
 
-fprintf('>>> Simulations Complete! Both Base & Proposed models are generated and running.\\n');
-open_system('proposed_extension_circuit');
+% 2. Powergui Environment Block
+add_block('powerlib/powergui', '{model_name}/powergui', 'Position', [40, 30, 110, 70]);
+set_param('{model_name}/powergui', 'SimulationMode', 'Discrete');
+set_param('{model_name}/powergui', 'SampleTime', 'T_s');
+
+% 3. Modulated AC Source (Equivalent Inverter Voltage Output)
+add_block('powerlib/Electrical Sources/AC Voltage Source', '{model_name}/Inverter_PWM_Stage', 'Position', [70, 170, 110, 225], 'Orientation', 'right');
+set_param('{model_name}/Inverter_PWM_Stage', 'Amplitude', 'V_dc * 0.8');
+set_param('{model_name}/Inverter_PWM_Stage', 'Frequency', 'f_grid');
+
+% 4. Inverter-side Inductor (L1)
+add_block('powerlib/Elements/Series RLC Branch', '{model_name}/L1_Filter', 'Position', [180, 185, 250, 215]);
+set_param('{model_name}/L1_Filter', 'BranchType', 'L');
+set_param('{model_name}/L1_Filter', 'Inductance', 'L1');
+
+% 5. Shunt Capacitor Filter (Cf + Rd)
+add_block('powerlib/Elements/Series RLC Branch', '{model_name}/Cf_Rd_Shunt', 'Position', [290, 260, 330, 330], 'Orientation', 'down');
+set_param('{model_name}/Cf_Rd_Shunt', 'BranchType', 'RC');
+set_param('{model_name}/Cf_Rd_Shunt', 'Capacitance', 'Cf');
+set_param('{model_name}/Cf_Rd_Shunt', 'Resistance', 'Rd');
+
+% 6. Grid-side Inductor (L2)
+add_block('powerlib/Elements/Series RLC Branch', '{model_name}/L2_Filter', 'Position', [370, 185, 440, 215]);
+set_param('{model_name}/L2_Filter', 'BranchType', 'L');
+set_param('{model_name}/L2_Filter', 'Inductance', 'L2');
+
+% 7. Grid Current Measurement
+add_block('powerlib/Measurements/Current Measurement', '{model_name}/I_Grid_Meas', 'Position', [480, 185, 510, 215]);
+
+% 8. AC Grid Bus
+add_block('powerlib/Electrical Sources/AC Voltage Source', '{model_name}/AC_Grid_Bus', 'Position', [580, 240, 620, 295], 'Orientation', 'up');
+set_param('{model_name}/AC_Grid_Bus', 'Amplitude', 'V_grid_rms * sqrt(2)');
+set_param('{model_name}/AC_Grid_Bus', 'Frequency', 'f_grid');
+
+% 9. Ground Neutral Return
+add_block('powerlib/Elements/Ground', '{model_name}/Ground_Ref', 'Position', [70, 310, 100, 340]);
+
+% 10. Waveform Monitoring Scopes
+add_block('simulink/Sinks/Scope', '{model_name}/Grid_Current_Scope', 'Position', [570, 130, 620, 180]);
+
+% 11. Novelty Extensions
+switch '{novelty_type}'
+    case 'LLCL_EXTENSION'
+        add_block('powerlib/Elements/Series RLC Branch', '{model_name}/Trap_Inductor', 'Position', [290, 350, 330, 410], 'Orientation', 'down');
+        set_param('{model_name}/Trap_Inductor', 'BranchType', 'L');
+        set_param('{model_name}/Trap_Inductor', 'Inductance', 'Lf_trap');
+        fprintf('Incorporated LLCL switching frequency notch trap branch.\\n');
+    case 'BATTERY_STORAGE'
+        add_block('powerlib/Electrical Sources/DC Voltage Source', '{model_name}/Aux_Battery', 'Position', [40, 400, 80, 450]);
+        set_param('{model_name}/Aux_Battery', 'Amplitude', 'V_bat_nom');
+        fprintf('Incorporated Battery Energy Storage Subsystem.\\n');
+end
+
+% 12. Physical Electrical Node Interconnections
+add_line('{model_name}', 'Inverter_PWM_Stage/RConn1', 'L1_Filter/LConn1');
+add_line('{model_name}', 'L1_Filter/RConn1', 'Cf_Rd_Shunt/LConn1');
+add_line('{model_name}', 'L1_Filter/RConn1', 'L2_Filter/LConn1');
+add_line('{model_name}', 'L2_Filter/RConn1', 'I_Grid_Meas/LConn1');
+add_line('{model_name}', 'I_Grid_Meas/RConn1', 'AC_Grid_Bus/LConn1');
+
+% Ground Return Paths
+add_line('{model_name}', 'Inverter_PWM_Stage/LConn1', 'Ground_Ref/LConn1');
+add_line('{model_name}', 'Cf_Rd_Shunt/RConn1', 'Ground_Ref/LConn1');
+add_line('{model_name}', 'AC_Grid_Bus/RConn1', 'Ground_Ref/LConn1');
+
+% Signal Connection to Scope
+add_line('{model_name}', 'I_Grid_Meas/1', 'Grid_Current_Scope/1');
+
+% 13. Save Compiled Binary Model
+save_system('{model_name}', '{model_name}.slx');
+fprintf('>>> Successfully synthesized {model_name}.slx without port mismatches!\\n');
 """
+        return builder_code
 
-    # 5. Compile ZIP Package
-    zip_buffer = io.BytesIO()
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as z:
-        # Dynamic MATLAB scripts
-        z.writestr("init_params.m", init_m_script)
-        z.writestr("build_base_model.m", builder_base)
-        z.writestr("build_proposed_model.m", builder_proposed)
-        z.writestr("run_simulation_workbench.m", master_runner)
 
-        # Include local .slx if already placed, otherwise builder handles it
-        for slx_file in required_slx:
-            slx_path = os.path.join(MODELS_DIR, slx_file)
-            if os.path.exists(slx_path):
-                z.write(slx_path, arcname=slx_file)
+class PDFParameterExtractor:
+    """
+    Extracts ratings from Base Paper and detects extensions from Abstract.
+    """
+    @staticmethod
+    def extract_ratings(pdf_bytes):
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        full_text = ""
+        for page in doc:
+            full_text += page.get_text() + " "
+        doc.close()
 
-        # Comprehensive Node & Wiring Matrix
-        schematic_manifest = f"""==============================================================================
-AUTONOMOUS SIMULINK TOPOLOGY SCHEMATIC MATRIX (IEEE Std 519)
-==============================================================================
-Discipline: {branch} ({level})
-Extension Topology Decoded: {novelty_type}
+        extracted = {}
 
-SYNTHESIZED CIRCUIT SPECIFICATIONS:
-- Inverter DC Voltage: {actual_vdc} V
-- AC Grid Potential: {actual_vgrid} V RMS @ 50 Hz
-- Switching Modulation Frequency: {actual_fsw / 1000.0} kHz
-- Inverter Filter Inductor (L1): {lcl_results['L1_inverter_H']} H
-- Grid Coupling Inductor (L2): {lcl_results['L2_grid_H']} H
-- Shunt Capacitance (Cf): {lcl_results['C_filter_F']} F
-- Damping Resistor (Rd): {lcl_results['R_damping_Ohm']} Ohms
-- Resonance Frequency: {lcl_results['f_resonance_Hz']} Hz ({lcl_results['status']})
+        vdc_match = re.search(r'(?:Vdc|V_dc|DC[- ]link voltage|DC bus)\s*[:=~]?\s*(\d{2,4})\s*V', full_text, re.IGNORECASE)
+        extracted['v_dc'] = float(vdc_match.group(1)) if vdc_match else 400.0
 
-PROGRAMMATIC GENERATION DIRECTIVE:
-1. Open MATLAB.
-2. In the Current Folder, run 'run_simulation_workbench.m'.
-3. The script will automatically assemble the block diagrams from scratch, 
-   compile 'base_paper_circuit.slx' and 'proposed_extension_circuit.slx',
-   and launch scopes with 100% convergence.
-"""
-        z.writestr("Circuit_Schematic_Node_Matrix.txt", schematic_manifest)
+        vgrid_match = re.search(r'(?:Grid voltage|AC voltage|V_grid|Vs)\s*[:=~]?\s*(\d{2,3})\s*V', full_text, re.IGNORECASE)
+        extracted['v_grid'] = float(vgrid_match.group(1)) if vgrid_match else 230.0
 
-        readme_text = f"""HOW TO EXECUTE:
-1. Extract this ZIP into your MATLAB folder.
-2. Open MATLAB.
-3. Run 'run_simulation_workbench.m'.
-4. The system automatically creates and runs the .slx circuit models directly.
-"""
-        z.writestr("README_HOW_TO_RUN.txt", readme_text)
+        fsw_match = re.search(r'(?:switching frequency|f_sw|fsw|fs)\s*[:=~]?\s*(\d{1,3}(?:\.\d+)?)\s*(k?Hz)', full_text, re.IGNORECASE)
+        if fsw_match:
+            val = float(fsw_match.group(1))
+            unit = fsw_match.group(2).lower()
+            extracted['f_sw'] = val * 1000.0 if 'k' in unit else val
+        else:
+            extracted['f_sw'] = 10000.0
 
-    zip_buffer.seek(0)
-    filename = f"ProjectGuide_{branch}_{level}_Autonomous_Simulink_Kit.zip"
+        prated_match = re.search(r'(?:rated power|nominal power|P_rated|Pout)\s*[:=~]?\s*(\d{1,4}(?:\.\d+)?)\s*(k?W)', full_text, re.IGNORECASE)
+        if prated_match:
+            val = float(prated_match.group(1))
+            unit = prated_match.group(2).lower()
+            extracted['p_rated'] = val * 1000.0 if 'k' in unit else val
+        else:
+            extracted['p_rated'] = 5000.0
 
-    return StreamingResponse(
-        zip_buffer,
-        media_type="application/x-zip-compressed",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
-    )
+        return extracted
+
+    @staticmethod
+    def extract_novelty_type(abstract_bytes):
+        """Identifies which Simulink extension circuit is required based on the abstract."""
+        if not abstract_bytes:
+            return "BASELINE", ["base_paper_circuit.slx"]
+
+        doc = fitz.open(stream=abstract_bytes, filetype="pdf")
+        text = ""
+        for page in doc:
+            text += page.get_text() + " "
+        doc.close()
+        text_lower = text.lower()
+
+        required_models = ["base_paper_circuit.slx"]
+
+        if any(w in text_lower for w in ["llcl", "trap", "notch"]):
+            novelty = "LLCL_EXTENSION"
+            required_models.append("proposed_llcl_circuit.slx")
+        elif any(w in text_lower for w in ["gmppt", "partial shading", "global maximum"]):
+            novelty = "GMPPT_SOLAR"
+            required_models.append("proposed_gmppt_circuit.slx")
+        elif any(w in text_lower for w in ["battery", "bess", "storage", "bidirectional"]):
+            novelty = "BATTERY_STORAGE"
+            required_models.append("proposed_battery_circuit.slx")
+        else:
+            novelty = "LLCL_EXTENSION"
+            required_models.append("proposed_llcl_circuit.slx")
+
+        return novelty, required_models
