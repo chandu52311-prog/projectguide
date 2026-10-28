@@ -34,7 +34,7 @@
                     Verified Standard Compliance
                 </span>
                 <span class="text-slate-600">|</span>
-                <span class="text-slate-400">IEEE • ACM • ASME • ASCE Engineering Protocols</span>
+                <span class="text-slate-400" id="standard-banner-text">IEEE • ACM • ASME • ASCE Engineering Protocols</span>
             </div>
             <div class="flex items-center gap-4 text-slate-400">
                 <button type="button" onclick="openModal('guidelines-modal')" class="hover:text-cyan-400 transition flex items-center gap-1">
@@ -189,7 +189,7 @@
                 <div id="terminal-logs" class="space-y-1 text-slate-300 max-h-36 overflow-y-auto"></div>
             </div>
 
-            <!-- Mathematical Audit Parameters Table (Rendered Dynamically from Backend) -->
+            <!-- Mathematical Audit Parameters Table -->
             <div id="audit-table-card" class="hidden p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                     <span class="font-bold text-cyan-400 uppercase tracking-wider font-mono">Mathematical Sizing & Topology Audit</span>
@@ -200,8 +200,8 @@
                         <thead>
                             <tr class="text-slate-400 border-b border-slate-800">
                                 <th class="py-2">System Parameter</th>
-                                <th class="py-2">Paper Extraction</th>
-                                <th class="py-2">Auto-Sized Status</th>
+                                <th class="py-2">Value</th>
+                                <th class="py-2">Provenance / Status</th>
                             </tr>
                         </thead>
                         <tbody id="audit-table-rows" class="divide-y divide-slate-800 text-slate-300 font-mono"></tbody>
@@ -228,19 +228,19 @@
             <div class="p-5 bg-slate-950/90 rounded-xl border border-slate-800 inline-block text-left w-full max-w-md mx-auto space-y-2.5 text-xs font-mono">
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
                     <span>Base Model Circuit (.slx)</span>
-                    <span class="text-emerald-400 font-semibold">Included</span>
+                    <span class="text-emerald-400 font-semibold">base_paper_circuit.slx</span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
                     <span id="novelty-manifest-label">Proposed Extension (.slx)</span>
-                    <span class="text-cyan-400 font-semibold" id="novelty-manifest-val">Tuned & Synchronized</span>
+                    <span class="text-cyan-400 font-semibold" id="novelty-manifest-val">proposed_circuit.slx</span>
                 </div>
                 <div class="flex justify-between py-1 border-b border-slate-900 text-slate-400">
-                    <span>MATLAB Auto-Runner Script</span>
+                    <span>MATLAB Master Workbench</span>
                     <span class="text-emerald-400 font-semibold">run_simulation_workbench.m</span>
                 </div>
                 <div class="flex justify-between pt-2 text-sm font-bold text-white">
                     <span>Delivery Settlement Fee</span>
-                    <span class="text-emerald-400">₹1,000</span>
+                    <span class="text-emerald-400" id="settlement-price-display">₹1,000</span>
                 </div>
             </div>
 
@@ -384,7 +384,7 @@
 
     <!-- Execution Logic Connected to FastAPI Backend -->
     <script>
-        const BACKEND_URL = "http://127.0.0.1:8000";
+        const BACKEND_URL = "http://127.0.0.1:8000";[cite: 6]
         let currentLevel = 'M.Tech';
         let currentBranch = 'EEE';
         let uploadedBasePaper = null;
@@ -419,8 +419,8 @@
             }
         };
 
-        function esc(s) { 
-            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); 
+        function esc(s) {[cite: 6]
+            return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");[cite: 6]
         }
 
         function updateDeliverablesView() {
@@ -428,7 +428,14 @@
             const conf = branchConfig[currentBranch];
             const data = conf[currentLevel === 'B.Tech' ? 'btech' : 'mtech'];
             document.getElementById('standard-badge').innerText = conf.badge;
+            document.getElementById('standard-banner-text').innerText = `${conf.standard} Engineering Protocols`;
             
+            // Dynamic Pricing & QR Code update
+            const fee = currentLevel === 'B.Tech' ? 500 : 1000;
+            document.getElementById('settlement-price-display').innerText = `₹${fee.toLocaleString('en-IN')}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3Dprojectguidelabs%40okaxis%26pn%3DProjectGuide%2520Verification%2520Network%26am%3D${fee}%26cu%3DINR`;
+            document.getElementById('upi-qr').src = qrUrl;
+
             preview.innerHTML = `
                 <div class="flex items-center gap-2 text-cyan-400 font-semibold mb-1">
                     <span>${currentBranch} • ${currentLevel} Deliverables Architecture (${conf.standard}):</span>
@@ -491,60 +498,59 @@
             document.getElementById('btn-verify').disabled = false;
         }
 
-        // Updated Quality Gate from frontend_api_patch_2.js
-        async function startQualityGate() {
-            const customNotes = document.getElementById('custom-notes').value.trim();
-            if (!uploadedBasePaper) { 
-                alert("Please upload your Primary Base Paper (PDF) to proceed."); 
-                return; 
+        async function startQualityGate() {[cite: 6]
+            const customNotes = document.getElementById('custom-notes').value.trim();[cite: 6]
+            if (!uploadedBasePaper) {[cite: 6]
+                alert("Please upload your Primary Base Paper (PDF) to proceed.");[cite: 6]
+                return;[cite: 6]
             }
-            softReset();
+            softReset();[cite: 6]
 
-            const terminal = document.getElementById('verification-terminal');
-            const logs = document.getElementById('terminal-logs');
-            const percent = document.getElementById('terminal-percent');
-            const btnVerify = document.getElementById('btn-verify');
-            const statusBox = document.getElementById('status-result-box');
-            const paymentGate = document.getElementById('payment-gate-section');
-            const auditCard = document.getElementById('audit-table-card');
-            const rows = document.getElementById('audit-table-rows');
+            const terminal = document.getElementById('verification-terminal');[cite: 6]
+            const logs = document.getElementById('terminal-logs');[cite: 6]
+            const percent = document.getElementById('terminal-percent');[cite: 6]
+            const btnVerify = document.getElementById('btn-verify');[cite: 6]
+            const statusBox = document.getElementById('status-result-box');[cite: 6]
+            const paymentGate = document.getElementById('payment-gate-section');[cite: 6]
+            const auditCard = document.getElementById('audit-table-card');[cite: 6]
+            const rows = document.getElementById('audit-table-rows');[cite: 6]
 
-            terminal.classList.remove('hidden');
-            logs.innerHTML = '';
-            btnVerify.disabled = true;
-            const log = (msg) => { 
-                const d = document.createElement('div'); 
-                d.innerHTML = `<span class="text-cyan-400">➜</span> ${msg}`; 
-                logs.appendChild(d); 
-                logs.scrollTop = logs.scrollHeight; 
+            terminal.classList.remove('hidden');[cite: 6]
+            logs.innerHTML = '';[cite: 6]
+            btnVerify.disabled = true;[cite: 6]
+            const log = (msg) => {[cite: 6]
+                const d = document.createElement('div');[cite: 6]
+                d.innerHTML = `<span class="text-cyan-400">➜</span> ${msg}`;[cite: 6]
+                logs.appendChild(d);[cite: 6]
+                logs.scrollTop = logs.scrollHeight;[cite: 6]
             };
 
             try {
-                percent.innerText = "20%";
-                log(`Uploading ${esc(uploadedBasePaper.name)}...`);
-                const fd = new FormData();
-                fd.append("paper", uploadedBasePaper);
-                if (uploadedExtension) fd.append("abstract", uploadedExtension);
-                fd.append("notes", customNotes);
+                percent.innerText = "20%";[cite: 6]
+                log(`Uploading ${esc(uploadedBasePaper.name)}...`);[cite: 6]
+                const fd = new FormData();[cite: 6]
+                fd.append("paper", uploadedBasePaper);[cite: 6]
+                if (uploadedExtension) fd.append("abstract", uploadedExtension);[cite: 6]
+                fd.append("notes", customNotes);[cite: 6]
 
-                const res = await fetch(`${BACKEND_URL}/api/audit-paper`, { method: "POST", body: fd });
-                if (!res.ok) {
-                    let detail = res.statusText;
-                    try { detail = (await res.json()).detail || detail; } catch (_) {}
-                    throw new Error(detail);
+                const res = await fetch(`${BACKEND_URL}/api/audit-paper`, { method: "POST", body: fd });[cite: 6]
+                if (!res.ok) {[cite: 6]
+                    let detail = res.statusText;[cite: 6]
+                    try { detail = (await res.json()).detail || detail; } catch (_) {}[cite: 6]
+                    throw new Error(detail);[cite: 6]
                 }
-                const r = await res.json();
-                latestAuditedData = r;
-                percent.innerText = "100%";
+                const r = await res.json();[cite: 6]
+                latestAuditedData = r;[cite: 6]
+                percent.innerText = "100%";[cite: 6]
 
-                const lcl = r.lcl_sizing, v = lcl.verification, p = r.provenance;
-                const tag = (k) => p[k] === "extracted"
-                    ? '<span class="text-emerald-400 font-semibold">EXTRACTED FROM PAPER</span>'
-                    : '<span class="text-amber-400 font-semibold">DEFAULT – NOT FOUND, PLEASE CHECK</span>';
-                log(`Novelty: ${esc(r.novelty_type)} (${esc(r.novelty_source)}${r.novelty_keywords.length ? ': ' + esc(r.novelty_keywords.join(', ')) : ''})`);
-                log(`Ripple gain at fsw vs L1-only: ${v.ripple_gain_vs_L1_only.toFixed(3)} (target ≤ ${lcl.att_ratio_target})`);
+                const lcl = r.lcl_sizing, v = lcl.verification, p = r.provenance;[cite: 6]
+                const tag = (k) => p[k] === "extracted"[cite: 6]
+                    ? '<span class="text-emerald-400 font-semibold">EXTRACTED FROM PAPER</span>'[cite: 6]
+                    : '<span class="text-amber-400 font-semibold">DEFAULT – NOT FOUND, PLEASE CHECK</span>';[cite: 6]
+                log(`Novelty: ${esc(r.novelty_type)} (${esc(r.novelty_source)}${r.novelty_keywords.length ? ': ' + esc(r.novelty_keywords.join(', ')) : ''})`);[cite: 6]
+                log(`Ripple gain at fsw vs L1-only: ${v.ripple_gain_vs_L1_only.toFixed(3)} (target ≤ ${lcl.att_ratio_target})`);[cite: 6]
 
-                const R = r.ratings;
+                const R = r.ratings;[cite: 6]
                 rows.innerHTML = `
                   <tr><td class="py-2">DC Bus (Vdc)</td><td class="py-2 text-cyan-300 font-bold">${R.v_dc} V</td><td class="py-2">${tag('v_dc')}</td></tr>
                   <tr><td class="py-2">Grid Voltage</td><td class="py-2 text-cyan-300 font-bold">${R.v_grid} V @ ${R.f_grid} Hz</td><td class="py-2">${tag('v_grid')}</td></tr>
@@ -553,79 +559,70 @@
                   <tr><td class="py-2">L1</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.L1_inverter_H * 1e3).toFixed(3)} mH</td></tr>
                   <tr><td class="py-2">L2</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.L2_grid_H * 1e3).toFixed(3)} mH</td></tr>
                   <tr><td class="py-2">Cf</td><td class="py-2 text-slate-400">Auto-sized</td><td class="py-2 text-cyan-400 font-semibold">${(lcl.C_filter_F * 1e6).toFixed(2)} µF</td></tr>
-                  <tr><td class="py-2">Resonance</td><td class="py-2 text-slate-400">${lcl.f_resonance_Hz.toFixed(0)} Hz</td><td class="py-2 font-semibold ${lcl.status === 'VERIFIED' ? 'text-emerald-400' : 'text-amber-400'}">${lcl.status}</td></tr>`;
-                auditCard.classList.remove('hidden');
+                  <tr><td class="py-2">Resonance</td><td class="py-2 text-slate-400">${lcl.f_resonance_Hz.toFixed(0)} Hz</td><td class="py-2 font-semibold ${lcl.status === 'VERIFIED' ? 'text-emerald-400' : 'text-amber-400'}">${lcl.status}</td></tr>`;[cite: 6]
+                auditCard.classList.remove('hidden');[cite: 6]
 
-                document.getElementById('novelty-manifest-label').innerText = `${r.novelty_type} model (generated in MATLAB)`;
-                document.getElementById('novelty-manifest-val').innerText = "Built by build_proposed_model.m";
+                document.getElementById('novelty-manifest-label').innerText = `${r.novelty_type} model (generated in MATLAB)`;[cite: 6]
+                document.getElementById('novelty-manifest-val').innerText = "Built by build_proposed_model.m";[cite: 6]
 
-                const ok = lcl.status === 'VERIFIED';
-                const warns = (lcl.warnings || []).map(esc).join('<br>');
+                const ok = lcl.status === 'VERIFIED';[cite: 6]
+                const warns = (lcl.warnings || []).map(esc).join('<br>');[cite: 6]
                 statusBox.innerHTML = `<div class="p-4 ${ok ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300' : 'bg-amber-950/60 border-amber-500 text-amber-300'} border rounded-xl text-xs">
                     <span class="font-bold text-sm block">${ok ? '✔ Analytical filter check passed' : '⚠ Filter check has warnings'}</span>
-                    Frequency-domain check only; Simulink models are built and simulated on your MATLAB.${warns ? '<br>' + warns : ''}</div>`;
-                statusBox.classList.remove('hidden');
+                    Frequency-domain check only; Simulink models are built and simulated on your MATLAB.${warns ? '<br>' + warns : ''}</div>`;[cite: 6]
+                statusBox.classList.remove('hidden');[cite: 6]
 
-                isVerified = true;
-                btnVerify.disabled = false;
-                paymentGate.classList.remove('hidden');
-                paymentGate.scrollIntoView({ behavior: 'smooth' });
+                isVerified = true;[cite: 6]
+                btnVerify.disabled = false;[cite: 6]
+                paymentGate.classList.remove('hidden');[cite: 6]
+                paymentGate.scrollIntoView({ behavior: 'smooth' });[cite: 6]
             } catch (err) {
-                console.error(err);
-                log(`<span class="text-red-400">Error: ${esc(err.message)} (backend: ${BACKEND_URL}; is uvicorn running?)</span>`);
-                btnVerify.disabled = false;
+                console.error(err);[cite: 6]
+                log(`<span class="text-red-400">Error: ${esc(err.message)} (backend: ${BACKEND_URL}; is uvicorn running?)</span>`);[cite: 6]
+                btnVerify.disabled = false;[cite: 6]
             }
         }
 
-        // Updated Real ZIP Streaming from frontend_api_patch_2.js
-        async function triggerBackendZipDownload() {
-            if (!isVerified || !latestAuditedData) { 
-                alert("Run the validation first."); 
-                return; 
-            }
-            const utr = document.getElementById('utr-input').value.trim();
-            if (!/^\d{12}$/.test(utr)) { 
-                alert("Enter a valid 12-digit UTR."); 
-                return; 
-            }
+        async function triggerBackendZipDownload() {[cite: 6]
+            if (!isVerified || !latestAuditedData) { alert("Run the validation first."); return; }[cite: 6]
+            const utr = document.getElementById('utr-input').value.trim();[cite: 6]
+            if (!/^\d{12}$/.test(utr)) { alert("Enter a valid 12-digit UTR."); return; }[cite: 6]
 
-            const btn = document.getElementById('btn-pay');
-            const original = btn.innerHTML;
-            btn.innerHTML = "⏳ Building package...";
-            btn.disabled = true;
+            const btn = document.getElementById('btn-pay');[cite: 6]
+            const original = btn.innerHTML;[cite: 6]
+            btn.innerHTML = "⏳ Building package...";[cite: 6]
+            btn.disabled = true;[cite: 6]
             try {
-                const R = latestAuditedData.ratings;
-                const fd = new FormData();
-                fd.append("branch", currentBranch);
-                fd.append("level", currentLevel);
-                for (const k of ["v_dc", "v_grid", "f_grid", "p_rated", "f_sw"]) fd.append(k, R[k]);
-                fd.append("novelty_type", latestAuditedData.novelty_type);
-                fd.append("provenance", JSON.stringify(latestAuditedData.provenance));
-                fd.append("custom_notes", document.getElementById('custom-notes').value.trim());
-                fd.append("utr", utr);
+                const R = latestAuditedData.ratings;[cite: 6]
+                const fd = new FormData();[cite: 6]
+                fd.append("branch", currentBranch);[cite: 6]
+                fd.append("level", currentLevel);[cite: 6]
+                for (const k of ["v_dc", "v_grid", "f_grid", "p_rated", "f_sw"]) fd.append(k, R[k]);[cite: 6]
+                fd.append("novelty_type", latestAuditedData.novelty_type);[cite: 6]
+                fd.append("provenance", JSON.stringify(latestAuditedData.provenance));[cite: 6]
+                fd.append("custom_notes", document.getElementById('custom-notes').value.trim());[cite: 6]
+                fd.append("utr", utr);[cite: 6]
 
-                const res = await fetch(`${BACKEND_URL}/api/generate-kit`, { method: "POST", body: fd });
-                if (!res.ok) {
-                    let detail = res.statusText;
-                    try { detail = (await res.json()).detail || detail; } catch (_) {}
-                    throw new Error(detail);
+                const res = await fetch(`${BACKEND_URL}/api/generate-kit`, { method: "POST", body: fd });[cite: 6]
+                if (!res.ok) {[cite: 6]
+                    let detail = res.statusText;[cite: 6]
+                    try { detail = (await res.json()).detail || detail; } catch (_) {}[cite: 6]
+                    throw new Error(detail);[cite: 6]
                 }
-                const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `ProjectGuide_${currentBranch}_${currentLevel.replace('.', '')}_Kit.zip`;
-                document.body.appendChild(a); 
-                a.click(); 
-                a.remove();
-                URL.revokeObjectURL(url);
-                btn.innerHTML = "✔ Download Complete";
-                alert("Extract the zip and run 'run_simulation_workbench' in MATLAB.");
+                const blob = await res.blob();[cite: 6]
+                const url = URL.createObjectURL(blob);[cite: 6]
+                const a = document.createElement("a");[cite: 6]
+                a.href = url;[cite: 6]
+                a.download = `ProjectGuide_${currentBranch}_${currentLevel.replace('.', '')}_Kit.zip`;[cite: 6]
+                document.body.appendChild(a); a.click(); a.remove();[cite: 6]
+                URL.revokeObjectURL(url);[cite: 6]
+                btn.innerHTML = "✔ Download Complete";[cite: 6]
+                alert("Extract the zip and run 'run_simulation_workbench' in MATLAB.");[cite: 6]
             } catch (err) {
-                console.error(err);
-                alert("Download failed: " + err.message);
-                btn.innerHTML = original;
-                btn.disabled = false;
+                console.error(err);[cite: 6]
+                alert("Download failed: " + err.message);[cite: 6]
+                btn.innerHTML = original;[cite: 6]
+                btn.disabled = false;[cite: 6]
             }
         }
 
@@ -640,11 +637,34 @@
             if (!msg) return;
 
             const box = document.getElementById('chat-messages');
+            
+            // User message
             const uDiv = document.createElement('div');
             uDiv.className = "bg-cyan-950 border border-cyan-800 p-2.5 rounded-xl text-cyan-200 text-right";
             uDiv.innerText = msg;
             box.appendChild(uDiv);
             input.value = '';
+
+            // Automated Advisor Response Logic
+            setTimeout(() => {
+                const aDiv = document.createElement('div');
+                aDiv.className = "bg-slate-900 border border-slate-800 p-3 rounded-xl text-slate-300 space-y-1";
+                
+                let reply = "Our automated pipeline extracts ratings (Vdc, Vgrid, fsw) directly from your base paper PDF and generates parameterized Simulink models.";
+                const lower = msg.toLowerCase();
+                if (lower.includes("utr") || lower.includes("pay")) {
+                    reply = "Enter any 12-digit reference number in the box above to verify and trigger the direct ZIP download.";
+                } else if (lower.includes("llcl") || lower.includes("filter")) {
+                    reply = "LLCL resonant trap calculations are derived based on IEEE Std 519 attenuation constraints and saved into init_params.m.";
+                } else if (lower.includes("matlab") || lower.includes("error")) {
+                    reply = "Ensure Simscape Electrical is installed in MATLAB and run 'run_simulation_workbench.m' from the unzipped package directory.";
+                }
+
+                aDiv.innerHTML = `<p class="font-semibold text-cyan-400 text-[11px]">Academic Support Advisor:</p><p>${reply}</p>`;
+                box.appendChild(aDiv);
+                box.scrollTop = box.scrollHeight;
+            }, 600);
+
             box.scrollTop = box.scrollHeight;
         }
 
