@@ -669,7 +669,7 @@
                 window.URL.revokeObjectURL(downloadUrl);
 
                 btnPay.innerHTML = "✔ Download Complete!";
-                alert("Verified Package Downloaded Successfully! Includes real .slx circuits and executable MATLAB .m scripts.");
+                alert("Verified Autonomous Package Downloaded! Extract and run 'run_simulation_workbench.m' in MATLAB to programmatically synthesize and simulate your models.");
             } catch (err) {
                 console.error(err);
                 alert("Download failed. Make sure your Python Uvicorn server is running.");
